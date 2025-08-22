@@ -1,0 +1,95 @@
+🌐 DBMS Architecture
+
+A Database Management System (DBMS) Architecture describes how database systems are structured, how data flows, and how users interact with the database.
+
+There are mainly 3 types of DBMS architecture:
+
+   -> 1-Tier Architecture (Single-Tier)
+
+   ->  2-Tier Architecture (Client-Server)
+
+    -> 3-Tier Architecture (Three-Layered)
+
+
+1️⃣ One-Tier Architecture (Single-Tier)
+
+    *  In this type, the database and the user interface both exist on the same machine.
+
+    * The user can directly access the database.
+
+    * It is mainly used for development, testing, and learning purposes.
+
+✅ Example:
+
+A student running Oracle/MySQL database on his laptop and directly writing SQL queries in the same machine.
+
+-- Example Query (Single-Tier)
+SELECT * FROM Students WHERE Grade = 'A';
+
+⚡ Limitation: Not suitable for large-scale systems (no security, no concurrent access handling).
+
+
+2️⃣ Two-Tier Architecture (Client-Server)
+
+* Here, the system is divided into Client and Server.
+
+* Client: Application where the user interacts (like Java, Python, or GUI tool).
+
+* Server: The DBMS that processes queries and manages the database.
+
+* Communication happens via ODBC / JDBC drivers.
+
+✅ Example:
+
+A banking application where the desktop app (client) sends SQL queries to the database server.
+
+📌 Working:
+
+* Client requests → SELECT balance FROM Accounts WHERE AccountNo=101;
+
+* Server (DBMS) processes it.
+
+* Server sends result back to client.
+
+⚡ Limitation: Tight coupling between client and server. If many clients request simultaneously, performance may reduce.
+
+
+3️⃣ Three-Tier Architecture (Most Popular)
+
+ * Introduces a middle layer (Application Server) between Client and DB Server.
+
+ * Layers:
+
+       1.Presentation Layer (Client) – user interface (mobile app, website).
+
+        2.Application Layer (Server/Business Logic) – processes client requests, applies business logic, communicates with DB.
+
+        3.Database Layer (DB Server) – actual database (MySQL, Oracle, PostgreSQL).
+
+✅ Example:
+
+* E-commerce Website (like Amazon):
+
+       * Client (Browser/App) – Customer searches for “Shoes”.
+
+        * Application Server – Receives request, checks stock, applies discount logic.
+
+         * Database Server – Fetches product data from DB and sends it back.
+
+📌 Flow Example (SQL in 3-Tier):
+
+     1.User: Search “Shoes” → Enters keyword in website.
+
+    2.Application Server: Converts it into query → SELECT * FROM Products WHERE Category='Shoes';
+
+     3. DB Server: Executes query and returns results.
+      
+     4. Application Server: Formats result and sends JSON/HTML to Client.
+
+⚡ Advantages:
+
+       *  High security (DB not directly exposed).
+        
+        *  Scalability (can handle millions of users).
+        
+        *  Separation of concerns (UI, Logic, Data are independent).
