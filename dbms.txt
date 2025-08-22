@@ -800,6 +800,208 @@ Dept
          
          * Helps in removing data redundancy.
 --------------------------------------------------------------------------------------------------
+🔹 What are Integrity Constraints?
+
+		*	Integrity Constraints are rules that ensure the accuracy and consistency of data in a relational database.
+			
+		 *	They are applied on tables (relations) to make sure only valid data gets stored.
+			
+	    	*Example: You can’t have a student without an ID or an age as negative.
+
+🔹 Types of Integrity Constraints
+1. Domain Constraint
+
+	*	Ensures that the value of an attribute (column) falls within a valid domain (data type + allowed range).
+		
+	 *	Example:
+
+CREATE TABLE Student (
+    RollNo INT,
+    Name VARCHAR(50),
+    Age INT CHECK (Age >= 18)
+);
+
+
+✅ Allowed: Age = 20
+❌ Not Allowed: Age = 15
+
+2. Entity Integrity Constraint
+
+	*	Every table must have a Primary Key, and it cannot be NULL.
+		
+	*	Ensures each row is unique and identifiable.
+		
+	*	Example:
+
+CREATE TABLE Student (
+    RollNo INT PRIMARY KEY,
+    Name VARCHAR(50),
+    Age INT
+);
+
+
+❌ Not Allowed: INSERT INTO Student VALUES (NULL, 'John', 22);
+(Because RollNo is NULL → violates entity integrity)
+
+3. Referential Integrity Constraint
+
+		* Ensures Foreign Key values must match a Primary Key in another table or be NULL.
+		
+		 * Prevents invalid references (dangling references).
+		
+		* Example:
+
+CREATE TABLE Department (
+    DeptID INT PRIMARY KEY,
+    DeptName VARCHAR(50)
+);
+
+CREATE TABLE Employee (
+    EmpID INT PRIMARY KEY,
+    Name VARCHAR(50),
+    DeptID INT,
+    FOREIGN KEY (DeptID) REFERENCES Department(DeptID)
+);
+
+
+✅ Allowed: INSERT INTO Employee VALUES (1, 'Alice', 101); if DeptID=101 exists in Department.
+❌ Not Allowed: INSERT INTO Employee VALUES (2, 'Bob', 999); (since DeptID=999 doesn’t exist).
+
+4. Key Constraints
+
+	* Ensures unique identification of records.
+	
+	* Types:
+
+			* Primary Key → Unique & Not NULL
+			
+			* Unique Key → Unique but allows NULL
+			
+			* Foreign Key → Refers to Primary Key of another table
+
+Example:
+
+CREATE TABLE Student (
+    RollNo INT PRIMARY KEY,
+    Email VARCHAR(50) UNIQUE
+);
+
+
+* Two students cannot have the same RollNo or same Email.
+
+5. Check Constraint
+
+	*	Ensures values satisfy a specific condition.
+		
+	*	Example:
+
+CREATE TABLE Account (
+    AccNo INT PRIMARY KEY,
+    Balance DECIMAL CHECK (Balance >= 0)
+);
+
+
+❌ Not Allowed: INSERT INTO Account VALUES (101, -500);
+
+6. Not Null Constraint
+
+		* Ensures a column cannot have NULL values.
+		
+		* Example:
+
+CREATE TABLE Student (
+    RollNo INT PRIMARY KEY,
+    Name VARCHAR(50) NOT NULL
+);
+
+
+❌ Not Allowed: INSERT INTO Student VALUES (1, NULL);
+
+--------------------------------------------------------------------------------------------
+
+Data Models in DBMS
+1. What is a Data Model?
+
+A Data Model in DBMS is a way to describe how data is represented, stored, and manipulated in a database.
+It provides the framework for designing the database and ensures that the relationships among data are clearly defined.
+
+👉 In short, a data model = blueprint of how data is organized.
+
+2. Types of Data Models
+
+There are mainly three categories of data models:
+
+A. High-Level / Conceptual Data Models
+
+			* Focus on what data is stored and how different data are related.
+			
+			* They are close to how humans view data (not computers).
+			
+			* Used during database design.
+			
+			* Example: Entity-Relationship (ER) Model.
+
+Example:
+
+		* Entities: Student, Course
+		
+		* Relationship: Student ENROLLED_IN Course
+
+This model doesn’t worry about how data is stored physically, just the relationships.
+
+B. Representational / Implementation Data Models
+
+		* Show how the database will look in the DBMS.
+		
+		* Closer to the way a DBMS organizes data.
+		
+		* Example: Relational Model (most widely used).
+
+Relational Model Example:
+We represent Student and Course as tables:
+
+Student Table
+
+Student_ID 	Name	Age
+1         	Alice	20
+2	        Bob	    21
+
+Course Table
+
+Course_ID	Course_Name
+C1       	DBMS
+C2	        Networks
+
+Relationship (Enrollment Table)
+
+Student_ID	Course_ID
+1	          C1
+2	          C2
+
+C. Low-Level / Physical Data Models
+
+		* Define how data is stored physically in the database.
+		
+		* Concerned with files, indexes, storage blocks, pointers.
+		
+		* Closest to computer hardware.
+
+Example:
+
+		* Student data stored in memory as heap files,
+		
+		* Index created on Student_ID for fast search,
+		
+		* Records stored in pages (blocks).
+
+4. Why are Data Models Important?
+
+✅ Provide a clear structure of data.
+✅ Help in designing a database schema.
+✅ Make communication between designers, developers, and end-users easier.
+✅ Improve data integrity and avoid redundancy.
+
+--------------------------------------------------------------------------------------------------
 
 
 
