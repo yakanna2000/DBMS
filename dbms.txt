@@ -1004,4 +1004,365 @@ Example:
 --------------------------------------------------------------------------------------------------
 
 
+🔹 What are Anomalies in DBMS?
 
+When a database is not properly normalized (i.e., not structured well), storing and retrieving data can cause problems. These problems are called Anomalies.
+
+They usually happen when data is stored in a single large table (un-normalized table) instead of breaking it into smaller related tables.
+
+There are 3 main types of anomalies:
+
+	1	Insertion Anomaly
+		
+	2	Update Anomaly
+		
+	3	Deletion Anomaly
+
+1️⃣ Insertion Anomaly
+
+👉 Problem while inserting new data into a table.
+
+Example:
+
+Consider this Student_Course table (not normalized):
+
+StudentID	StudentName 	CourseID	CourseName
+1	          Raj             C101	     DBMS
+2	         Ravi	          C102	      Java
+
+Now suppose we want to add a new course (C103 - Python) which has no students yet.
+
+		* We cannot insert it unless we put a dummy student (e.g., NULL or fake ID).
+		
+		* That’s the insertion anomaly.
+
+✅ Reason: Course information depends on Student information. We can’t insert a course without a student.
+
+2️⃣ Update Anomaly
+
+👉 Problem while updating duplicate data in multiple places.
+
+Example:
+
+In the same table:
+
+StudentID	StudentName	CourseID	CourseName
+1	         Raj	     C101	    DBMS
+2	         Ravi	     C101	    DBMS
+
+Now suppose the course name DBMS is changed to "Advanced DBMS".
+
+		* We must update it everywhere it appears.
+		
+		* If we forget to update one row, we will have inconsistent data:
+
+					* Raj → "Advanced DBMS"
+					
+					* Ravi → "DBMS"
+
+This is an update anomaly.
+
+✅ Reason: Same data is stored redundantly in multiple rows.
+
+3️⃣ Deletion Anomaly
+
+👉 Problem when deleting one data unintentionally removes another important data.
+
+Example:
+
+Our table:
+
+StudentID	StudentName	CourseID	CourseName
+1            	Raj	      C101	      DBMS
+2	            Ravi	   C102	       Java
+
+If Ravi drops the course Java and we delete his record,
+➡ We also lose the information that Java course (C102) exists.
+
+This is a deletion anomaly.
+
+✅ Reason: Course information is dependent on student presence.
+
+🔹 Why do anomalies occur?
+
+		* Because the table has redundant data.
+		
+		* Multiple pieces of information are stored together in one table.
+		
+		* Dependencies are not properly separated.
+
+----------------------------------------------------------------------------------------------------------
+
+🔹 What is Functional Dependency?
+
+A functional dependency (FD) is a relationship between attributes in a relation (table).
+It means:
+👉 If two tuples (rows) have the same values for attribute X, they must also have the same value for attribute Y.
+We write this as:
+
+    X → Y   (X functionally determines Y)
+
+
+Example:
+
+			* In a Student table(StudentID, Name, Dept, CGPA)
+			
+			* StudentID → Name, Dept, CGPA
+			Because StudentID uniquely determines all other details.
+
+🔹 Properties of Functional Dependencies
+
+These are also called Armstrong’s Axioms. They help us derive all possible FDs from a given set.
+
+1. Reflexivity Rule
+
+If Y is a subset of X, then
+
+X → Y
+
+
+✅ Example:
+
+     {StudentID, Name} → StudentID (because StudentID is part of X)
+
+2. Augmentation Rule
+
+If X → Y, then for any attribute set Z:
+
+XZ → YZ
+
+
+👉 Adding the same set Z to both sides still holds.
+
+✅ Example:
+
+		If StudentID → Name, then
+		{StudentID, Dept} → {Name, Dept}
+
+3. Transitivity Rule
+
+If X → Y and Y → Z, then
+
+X → Z
+
+
+✅ Example:
+
+	*	StudentID → Dept
+		
+	*	Dept → HOD
+		
+	*	So, StudentID → HOD
+
+4. Union (Additivity) Rule
+
+If X → Y and X → Z, then
+
+X → YZ
+
+
+✅ Example:
+
+		* StudentID → Name
+		
+		* StudentID → Dept
+		
+		* So, StudentID → {Name, Dept}
+
+5. Decomposition Rule
+
+If X → YZ, then
+
+X → Y  and  X → Z
+
+
+✅ Example:
+
+		* StudentID → {Name, Dept}
+		
+		* So, StudentID → Name and StudentID → Dept
+
+6. Pseudo Transitivity Rule
+
+If X → Y and WY → Z, then
+
+WX → Z
+
+
+✅ Example:
+
+		* StudentID → Dept
+		
+		* {Dept, Course} → Faculty
+		
+		* So, {StudentID, Course} → Faculty
+
+🔹 Why are these Properties Important?
+
+			* Used in normalization (removing anomalies).
+			
+			* Help find candidate keys.
+			
+			* Used to derive closure of attributes (all attributes functionally determined).
+			
+			* Ensures data consistency.
+---------------------------------------------------------------------------------------------------------
+
+🔹 Types of Functional Dependencies
+1. Trivial Functional Dependency
+		
+	*	A dependency is trivial if the right-hand side is a subset of the left-hand side.
+		
+	*	Example:
+
+				*	{StudentID, Name} → Name
+					(Already Name is part of left-hand side)
+
+2. Non-Trivial Functional Dependency
+
+	*	A dependency is non-trivial if the right-hand side is not a subset of the left-hand side.
+		
+	*	Example:
+
+				* StudentID → Name
+				(Name is not part of StudentID)
+
+3. Completely Non-Trivial FD
+
+		* A dependency is completely non-trivial if LHS and RHS have nothing in common.
+		
+		* Example:
+
+				* StudentID → Dept
+				(StudentID and Dept share nothing in common)
+
+4. Transitive Dependency
+
+		* If X → Y and Y → Z, then X → Z (Indirect dependency).
+		
+		* Example:
+
+					* StudentID → Dept
+					
+					* Dept → HOD
+					⇒ StudentID → HOD
+
+5. Multivalued Dependency (MVD)
+
+			* When one attribute determines multiple independent attributes.
+			
+			* Example: In a Student table:
+
+					* StudentID →→ Hobby
+					(A student can have many hobbies independent of other attributes)
+
+6. Partial Dependency
+
+			* When a non-prime attribute depends on part of a candidate key (only occurs in composite keys).
+			
+			 * Example:
+			Suppose in a table (StudentID, CourseID, Grade)
+
+						* Candidate Key = {StudentID, CourseID}
+						
+						* If StudentID → Name, it’s a partial dependency (because Name depends only on StudentID, not whole key).
+
+7. Full Functional Dependency
+
+		* A dependency is full if it depends on the whole composite key, not just a part.
+		
+		* Example:
+
+				* (StudentID, CourseID) → Grade
+				(Grade depends on both StudentID and CourseID together)
+-----------------------------------------------------------------------------------------------------------
+
+🔹 What is Attribute Closure?
+
+		*  In DBMS (Database Management Systems),
+		the attribute closure of a set of attributes X, denoted as X⁺, is the set of all attributes that can be functionally determined from X using a given set of Functional Dependencies (FDs).
+
+👉 In simple words:
+Attribute closure tells us what attributes can be uniquely identified if we know X.
+
+🔹 Why is Attribute Closure important?
+
+		* Used to check if a set of attributes is a candidate key.
+		
+		* Used in normalization (to remove redundancy).
+		
+		* Helps in finding minimal keys and testing FD validity.
+
+🔹 Steps to Find Attribute Closure (X⁺)
+
+		1.Start with X⁺ = X (put all attributes of X in closure initially).
+		
+		2.Look at the given Functional Dependencies (FDs).
+		
+		       * If left-hand side of FD ⊆ X⁺, then add the right-hand side to X⁺.
+		
+		3.Repeat until no new attributes can be added.
+
+🔹 Example 1: Simple Attribute Closure
+
+Suppose we have a relation:
+R(A, B, C, D)
+Functional Dependencies:
+
+	* A → B
+	
+	* B → C
+	
+	* C → D
+
+Find closure of A⁺.
+
+Step 1: Start with A⁺
+
+		A⁺ = {A}
+
+Step 2: Apply FDs
+
+		* From A → B → Add B → A⁺ = {A, B}
+		
+		* From B → C (since B ∈ A⁺) → Add C → A⁺ = {A, B, C}
+		
+		* From C → D (since C ∈ A⁺) → Add D → A⁺ = {A, B, C, D}
+
+✅ Final Answer: A⁺ = {A, B, C, D}
+
+👉 Means knowing A alone, we can determine all attributes.
+So, A is a Candidate Key.
+
+🔹 Example 2: Different Closure
+
+Relation: R(A, B, C, D, E)
+Functional Dependencies:
+
+		1.A → BC
+		
+		2.CD → E
+		
+		3.B → D
+		
+		4.E → A
+
+Find closure of A⁺.
+
+Step 1: Start with A⁺
+
+   A⁺ = {A}
+
+Step 2: Apply FDs
+
+			* From A → BC → Add B, C → A⁺ = {A, B, C}
+			
+			* From B → D (B ∈ A⁺) → Add D → A⁺ = {A, B, C, D}
+			
+			* From CD → E (C,D ∈ A⁺) → Add E → A⁺ = {A, B, C, D, E}
+			
+			* From E → A (already in closure, no change).
+
+✅ Final Answer: A⁺ = {A, B, C, D, E}
+
+👉 Means A is a Super Key (and candidate key).
