@@ -1366,3 +1366,182 @@ Step 2: Apply FDs
 ✅ Final Answer: A⁺ = {A, B, C, D, E}
 
 👉 Means A is a Super Key (and candidate key).
+
+-----------------------------------------------------------------------------------------------------
+1. Attribute Closure
+
+👉 The closure of an attribute (or set of attributes) is the set of all attributes that can be functionally determined from it using the given Functional Dependencies (FDs).
+
+We denote closure as X⁺, where X is an attribute set.
+
+2. Steps to find Closure
+
+		1.Start with the attribute set X.
+		
+		2.Add attributes from FDs where X determines something.
+		
+		3.Keep applying FDs until no more new attributes can be added.
+		
+		4.The final set = closure of X (X⁺).
+
+3. Finding Superkey
+
+    * A set of attributes X is a superkey if X⁺ = all attributes of the relation (R).
+
+4. Finding Candidate Key
+
+		* A candidate key is a minimal superkey.
+		
+		* Minimal means: if you remove any attribute from it, it should not remain a superkey.
+
+5. Example
+
+Relation R(A, B, C, D, E)
+Functional Dependencies (FDs):
+
+		1.A → BC
+		
+		2.CD → E
+		
+		3.B → D
+		
+		4.E → A
+
+Step 1: Find closure of attributes
+
+* (i) Closure of A (A⁺):
+
+		* Start: {A}
+		
+		* A → BC → add B, C → {A, B, C}
+		
+		* From B → D → add D → {A, B, C, D}
+		
+		* From CD → E → add E → {A, B, C, D, E}
+		✅ So A⁺ = {A, B, C, D, E} = all attributes
+
+👉 A is a superkey.
+
+* (ii) Closure of B (B⁺):
+
+		* Start: {B}
+		
+		* B → D → {B, D}
+		
+		* CD → E requires C, not present
+		
+		* E → A requires E, not present
+			✅ So B⁺ = {B, D} → not all attributes
+			👉 B is not a superkey.
+
+(iii) Closure of C (C⁺):
+
+		* Start: {C}
+		
+		* No FD directly from C
+		✅ So C⁺ = {C} → not a superkey.
+
+(iv) Closure of CD (CD⁺):
+
+		* Start: {C, D}
+		
+		* CD → E → {C, D, E}
+		
+		* E → A → {C, D, E, A}
+		
+		* A → BC → {C, D, E, A, B}
+            ✅ CD⁺ = {A, B, C, D, E} → all attributes
+
+    👉 CD is a superkey.
+
+Step 2: Find Candidate Keys
+
+* We found A is a superkey. Check minimality:
+
+		* Remove A? Nothing left → not superkey.
+		   ✅ So A is a candidate key.
+
+* We found CD is a superkey. Check minimality:
+
+			* Remove C → D⁺ = {D} → not superkey
+			
+			* Remove D → C⁺ = {C} → not superkey
+			   ✅ So CD is a candidate key.
+
+✅ Final Answer
+
+		* Superkeys: A, CD, AC, AD, … (and any superset of candidate keys)
+		
+		* Candidate Keys: A and CD
+----------------------------------------------------------------------------------------------------------
+
+🔹 What is Decomposition?
+
+Decomposition means breaking a large relation (table) into two or more smaller relations to remove redundancy, anomalies, and ensure data integrity.
+
+       * Example: If we have a table with too many attributes, we split it into smaller tables.
+
+But while splitting, we must ensure we don’t lose information.
+
+🔹 Types of Decomposition
+
+There are two types:
+
+1 .Lossless Decomposition
+
+2 .Lossy Decomposition
+
+✅ 1. Lossless Decomposition
+
+👉 A decomposition is lossless if we can join the smaller tables back and get the original relation without losing any data.
+
+      * This is the desired property in normalization.
+
+Example of Lossless:
+
+Relation R(A, B, C)
+Functional Dependencies: A → B
+
+We decompose R into two relations:
+
+  * R1(A, B)
+
+   * R2(A, C)
+
+Now, when we join R1 and R2 on A, we get back the original table R(A, B, C).
+
+✔ No information is lost → Lossless Decomposition
+
+❌ 2. Lossy Decomposition
+
+👉 A decomposition is lossy if after joining the smaller relations, we don’t get the original relation correctly.
+We may get extra tuples (spurious data) or lose some data.
+
+Example of Lossy:
+
+Relation R(A, B, C)
+Functional Dependencies: A → B
+
+We decompose R into:
+
+   * R1(A, B)
+
+   * R2(B, C)
+
+Now, when we join R1 and R2 on B, we may get tuples that never existed in the original relation.
+
+This means we got wrong results (extra data) → Lossy Decomposition
+
+🔑 Rule to Check Lossless Decomposition
+
+👉 A decomposition of relation R into R1 and R2 is lossless if:
+
+(R1 ∩ R2) → (R1 OR R2)
+
+In other words:
+
+   * The common attribute(s) between R1 and R2 should be a key in at least one of the relations.
+
+----------------------------------------------------------------------------------------------------------
+
+
