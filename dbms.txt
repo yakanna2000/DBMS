@@ -1544,4 +1544,312 @@ In other words:
 
 ----------------------------------------------------------------------------------------------------------
 
+🔹 What is Normalization?
 
+Normalization is a process in DBMS used to:
+
+			* Organize data into tables.
+			
+			* Remove redundancy (duplicate data).
+			
+			* Ensure data integrity (accuracy & consistency).
+			
+			* Divide large tables into smaller, related tables.
+
+👉 The aim is to make databases efficient and free from anomalies (insertion, update, deletion).
+
+🔹 Types of Normal Forms (Step by Step)
+1. First Normal Form (1NF)
+
+👉 A relation is in 1NF if:
+
+			* Each column has atomic (indivisible) values.
+			
+			* No repeating groups or arrays.
+			
+			* Each record is unique.
+
+Example (Not in 1NF):
+
+Student Table
++-----------+--------------------+
+| StudentID | Subjects           |
++-----------+--------------------+
+| 1         | Math, Physics      |
+| 2         | Chemistry, Biology |
+
+
+Here, Subjects has multiple values → ❌ Not atomic.
+
+Convert to 1NF:
+
++-----------+-----------+
+| StudentID | Subject   |
++-----------+-----------+
+| 1         | Math      |
+| 1         | Physics   |
+| 2         | Chemistry |
+| 2         | Biology   |
+
+
+✅ Now each column has atomic values.
+
+2. Second Normal Form (2NF)
+
+👉 A table is in 2NF if:
+
+		1.It is already in 1NF.
+		
+		2.No partial dependency → i.e., no non-key attribute depends on only part of a composite primary key.
+
+Example (Not in 2NF):
+
++-----------+-----------+---------+
+| StudentID | CourseID  | CourseName |
++-----------+-----------+---------+
+| 1         | C101      | DBMS    |
+| 2         | C102      | OS      |
+
+
+Here, (StudentID, CourseID) = Primary Key.
+But CourseName depends only on CourseID → Partial dependency ❌.
+
+Convert to 2NF:
+
+Student_Course
++-----------+-----------+
+| StudentID | CourseID  |
++-----------+-----------+
+| 1         | C101      |
+| 2         | C102      |
+
+Course
++-----------+------------+
+| CourseID  | CourseName |
++-----------+------------+
+| C101      | DBMS       |
+| C102      | OS         |
+
+
+✅ Now no partial dependency.
+
+3. Third Normal Form (3NF)
+
+👉 A table is in 3NF if:
+
+		1.It is in 2NF.
+		
+		2.No transitive dependency (non-key attributes should not depend on other non-key attributes).
+
+Example (Not in 3NF):
+
++-----------+-----------+-------------+
+| EmpID     | DeptID    | DeptName    |
++-----------+-----------+-------------+
+| 1         | D1        | HR          |
+| 2         | D2        | Finance     |
+
+
+Here:
+
+		* EmpID → DeptID
+		
+		* DeptID → DeptName → Transitive dependency ❌
+
+Convert to 3NF:
+
+Employee
++-----------+-----------+
+| EmpID     | DeptID    |
++-----------+-----------+
+| 1         | D1        |
+| 2         | D2        |
+
+Department
++-----------+-------------+
+| DeptID    | DeptName    |
++-----------+-------------+
+| D1        | HR          |
+| D2        | Finance     |
+
+
+✅ Transitive dependency removed.
+
+4. Boyce-Codd Normal Form (BCNF)
+
+👉 A stricter version of 3NF.
+A table is in BCNF if:
+
+      *  For every functional dependency (X → Y), X should be a super key.
+
+Example (Not in BCNF):
+
++-----------+-----------+----------+
+| StudentID | CourseID  | Teacher  |
++-----------+-----------+----------+
+| 1         | DBMS      | Prof A   |
+| 2         | OS        | Prof B   |
+
+
+Here:
+
+		* (StudentID, CourseID) is primary key.
+		
+		* But CourseID → Teacher (Teacher depends only on CourseID) → violates BCNF ❌.
+
+Convert to BCNF:
+
+Student_Course
++-----------+-----------+
+| StudentID | CourseID  |
++-----------+-----------+
+| 1         | DBMS      |
+| 2         | OS        |
+
+Course_Teacher
++-----------+----------+
+| CourseID  | Teacher  |
++-----------+----------+
+| DBMS      | Prof A   |
+| OS        | Prof B   |
+
+
+✅ Now dependency preserved properly.
+
+5. Fourth Normal Form (4NF)
+
+👉 A table is in 4NF if:
+
+  * It is in BCNF.
+
+   * No multi-valued dependencies exist.
+
+Example (Not in 4NF):
+
++-----------+-----------+-----------+
+| StudentID | Hobby     | Language  |
++-----------+-----------+-----------+
+| 1         | Singing   | English   |
+| 1         | Dancing   | English   |
+| 1         | Singing   | Hindi     |
+| 1         | Dancing   | Hindi     |
+
+
+Problem: Hobby and Language are independent multi-valued facts → redundancy.
+
+Convert to 4NF:
+
+Student_Hobby
++-----------+-----------+
+| StudentID | Hobby     |
++-----------+-----------+
+| 1         | Singing   |
+| 1         | Dancing   |
+
+Student_Language
++-----------+-----------+
+| StudentID | Language  |
++-----------+-----------+
+| 1         | English   |
+| 1         | Hindi     |
+
+
+✅ Now no multi-valued dependency.
+
+6. Fifth Normal Form (5NF / PJNF)
+
+✅ A relation is in 5NF if:
+
+		* It is in 4NF.
+		
+		* It cannot be decomposed into smaller tables without losing information.
+		
+		* Deals with Join Dependencies.
+
+Example:
+
+Project (ProjectID, SupplierID, PartID)
+
+
+Here, a project can have multiple suppliers and parts, but supplier and parts are independent.
+So we decompose:
+
+Project_Supplier (ProjectID, SupplierID)
+Project_Part (ProjectID, PartID)
+Supplier_Part (SupplierID, PartID)
+
+🔹 Interview Tip
+
+If interviewer asks:
+
+What is Normalization?
+→ "It is the process of organizing data into multiple related tables to reduce redundancy and improve consistency."
+
+Which normal forms are commonly used?
+→ "Up to 3NF is mostly used in real projects. BCNF is sometimes applied. 4NF and 5NF are rare in practice."
+
+
+LET’S START WITH DBMS :)
+
+1.First Normal Form (1NF)
+A relation is in 1NF if it contains only atomic values (no multivalued attributes).
+Since we are assuming our relation R is in a standard relational model, it is already
+in 1NF.
+
+2. Second Normal Form (2NF)
+A relation is in 2NF if it is in 1NF and every non-prime attribute is fully functionally
+dependent on every candidate key of the relation(P.D ->LHS is a proper subset of
+Candidate key AND RHS is a non-prime attribute).
+
+A→BC = no partial dependency (A is a CK)
+B→C = no partial dependency (B is a CK)
+A→B= no partial dependency (A is a CK)
+AB→C= no partial dependency (AB is a combination of candidate keys, Its SK)
+B→A= no partial dependency (B is a CK) , R is in 2NF.
+
+LET’S START WITH DBMS :)
+
+3. Third Normal Form (3NF)
+A relation is in 3NF if it is in 2NF and no transitive dependency exists.
+X->Y (X is a superkey OR Y is a prime attribute if true no transitive dependency)
+
+A→BC = no transitive dependency (A is a CK)
+B→C = no transitive dependency (B is a CK)
+A→B= no transitive dependency (A is a CK)
+AB→C= no transitive dependency (AB is a combination of candidate keys, Its SK)
+B→A= no transitive dependency (B is a CK) , R is in 3NF.
+
+LET’S START WITH DBMS :)
+
+4. BCNF
+A relation is in BCNF if it is in 3NF and for every functional dependency X→Y, X is a
+superkey.
+
+A→BC = A is a CK
+B→C = B is a CK
+A→B= A is a CK
+AB→C= AB is a combination of candidate keys, Its SK
+B→A= B is a CK , R is in BCNF.
+
+The highest normal form for the given relation R(A,B,C,D) is BCNF.
+
+LET’S START WITH DBMS :)
+
+How to normalise table
+
+In normalisation we generally break/decompose the table into 2 or more tables.
+
+Steps to normalize a table
+1.Write down all the attributes of table, CK, Prime and non-prime attributes and start
+analyzing with the FD.
+2. For table to be in 1NF : Table should have atomic (indivisible) values and a primary key
+
+3.For table to be in 2NF : No Partial dependency(LHS proper subset of CK and RHS non-
+prime attribute should be false)
+
+4. For table to be in 3NF : No transitive dependency(LHS must be a CK or RHS a prime
+attribute should be true)
+5. For table to be in BCNF : LHS must be a CK or SK
+6. If it fails at any of these steps decompose the table on a common attribute which is CK
+(lossless)
+--------------------------------------------------------------------------------------------------------
