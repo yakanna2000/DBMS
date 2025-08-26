@@ -2287,3 +2287,530 @@ When using locks, deadlocks may occur. Handling methods are:
 3.Deadlock Avoidance:
 
    * Use Banker’s algorithm to avoid unsafe states.c
+-------------------------------------------------------------------------------------------------
+
+🔴 Deadlock in DBMS
+📌 Definition:
+
+A deadlock in DBMS is a situation in which two or more transactions are waiting for each other to release resources, but none of them releases the resource, so all transactions are stuck forever.
+
+It’s like a traffic jam at a single-lane bridge:
+
+		* Car A waits for Car B to move.
+		
+		* Car B waits for Car A to move.
+		→ Neither can proceed → Deadlock.
+
+🔹 Conditions for Deadlock
+
+According to Coffman’s conditions, a deadlock can occur if all 4 conditions hold simultaneously:
+
+ 1.Mutual Exclusion → At least one resource must be held in a non-shareable mode.
+(Example: A row lock in a database table).
+
+2.Hold and Wait → A transaction is holding one resource and waiting for another.
+(Example: T1 holds lock on X and waits for Y).
+
+3.No Preemption → A resource cannot be forcibly taken away from a transaction.
+(Only the transaction itself can release it).
+
+4.Circular Wait → A set of transactions are waiting in a circular chain.
+(T1 → waits for T2’s resource, T2 → waits for T3’s resource, T3 → waits for T1’s resource).
+
+👉 Deadlock occurs when all these four are present.
+
+🔹 Example of Deadlock in DBMS
+
+Suppose we have two transactions:
+
+		1.T1: needs data items X and Y.
+		
+		2.T2: needs data items Y and X.
+
+Step-by-step:
+
+		1.T1 locks X.
+		
+		2.T2 locks Y.
+		
+		3.T1 now requests Y, but it’s already locked by T2 → so T1 waits.
+		
+		4.T2 now requests X, but it’s locked by T1 → so T2 waits.
+
+👉 Both transactions wait forever → Deadlock.
+
+Time	Transaction T1	Transaction T2
+t1	   Lock(X) ✅	
+t2		                 Lock(Y) ✅
+t3   	Wait(Y) ❌	
+t4		                Wait(X) ❌
+t5   	DEADLOCK	   DEADLOCK
+
+
+
+🔹 Methods of Handling Deadlocks
+
+Deadlock = A situation where two or more processes wait forever for each other’s resources.
+
+👉 Example:
+
+Process P1 locks resource A and requests B.
+
+Process P2 locks resource B and requests A.
+Neither can proceed → Deadlock.
+
+To handle deadlocks, OS/DBMS uses 4 approaches:
+
+1.Deadlock Prevention
+
+2.Deadlock Avoidance (Banker’s Algorithm)
+
+3.Deadlock Detection & Recovery
+
+4.Deadlock Ignorance (Ostrich Method)
+
+🅰️ 1. Deadlock Prevention
+
+Idea: Design the system so that deadlock never occurs by breaking one of the Coffman’s conditions (necessary conditions for deadlock):
+
+1.Mutual Exclusion
+
+2.Hold and Wait
+
+3.No Preemption
+
+4.Circular Wait
+
+🔹 How Prevention Works:
+
+* Mutual Exclusion
+
+		* Some resources must be non-sharable (like a printer). This condition cannot always be removed.
+
+* Hold and Wait
+
+		* Require a process to request all resources at once before starting.
+		
+		* Example: A process needing Printer + Scanner must ask for both upfront.
+		
+		* ❌ Problems: Long waiting time, poor utilization, and sometimes processes don’t know all needs in advance.
+
+* No Preemption
+
+		* If a process holding resources requests another unavailable resource → take away its current resources and roll it back.
+		
+		* Example: If P1 holds CPU & requests Disk, but Disk is busy, OS preempts CPU from P1 and gives it to someone else.
+
+* Circular Wait
+		
+		* Impose a global ordering of resources.
+		
+		* Example: Order resources as Printer < Scanner < Disk.
+		
+		* A process holding Printer can request Scanner, but not Disk before Scanner.
+		
+		* Prevents circular chains.
+
+✅ Pros: Guarantees no deadlock.
+❌ Cons: Low resource utilization, starvation, sometimes impractical.
+
+🅱️ 2. Deadlock Avoidance (Banker’s Algorithm)
+
+Idea: Allow deadlock conditions, but avoid unsafe allocations by carefully deciding whether to grant a request.
+
+👉 Key Concepts:
+
+		* Safe State: There exists at least one sequence of process execution where all can finish. → No deadlock.
+		
+		* Unsafe State: The system may enter deadlock later.
+
+🔹 Banker’s Algorithm (Named because like a banker checking loans)
+
+Data Structures:
+
+		* Available[] → Number of available instances of each resource.
+		
+		* Max[][] → Maximum demand of each process.
+		
+		* Allocation[][] → Currently allocated resources.
+		
+		* Need[][] = Max – Allocation.
+
+Example:
+
+System with 3 resources (A, B, C) and 3 processes (P1, P2, P3).
+
+Available = [3, 3, 2]
+
+Max:
+P1 [7, 5, 3]
+P2 [3, 2, 2]
+P3 [9, 0, 2]
+
+Allocation:
+P1 [0, 1, 0]
+P2 [2, 0, 0]
+P3 [3, 0, 2]
+
+Need = Max - Allocation:
+P1 [7, 4, 3]
+P2 [1, 2, 2]
+P3 [6, 0, 0]
+
+
+👉 Banker’s Algorithm steps:
+
+		1.Check if any process’s Need ≤ Available.
+		
+		2.If yes → assume it finishes, release its allocation back into Available.
+		
+		3.Repeat until all finish.
+
+In this case:
+
+		* P2 can run (Need ≤ Available). After finishing → Available = [5,3,2].
+		
+		* Then P1 can run. → Available increases.
+		
+		* Finally P3 runs.
+
+Since all can finish → Safe State ✅
+
+If granting a request leads to Unsafe State → request is denied temporarily.
+
+✅ Pros: Dynamic, avoids deadlock.
+❌ Cons: Requires knowing maximum demands in advance, may cause delays.
+
+🅾️ 3. Deadlock Detection & Recovery
+
+Idea: Allow deadlocks to occur, but detect and fix them.
+
+🔹 Detection
+
+* Use a Wait-for Graph (WFG):
+
+		* Nodes = Processes.
+		
+		* Edge Pi → Pj if Pi waits for resource held by Pj.
+
+If a cycle exists → Deadlock detected.
+
+👉 Example:
+T1 → T2, T2 → T3, T3 → T1 → cycle → Deadlock.
+
+🔹 Recovery
+
+		* Once detected, break the deadlock by:
+		
+		* Abort (Rollback) Transactions: Kill one or more processes.
+		
+		* Victim Selection Criteria: Choose the process with least work done, lowest priority, or holding fewer resources.
+		
+		* Resource Preemption: Temporarily take resources from a process and give them to others.
+		
+		* Restart: Restart killed process later.
+
+✅ Pros: Efficient utilization since processes don’t block unnecessarily.
+❌ Cons: Rollbacks waste work, cycle detection adds overhead.
+
+🅿️ 4. Deadlock Ignorance (Ostrich Algorithm)
+
+Idea: Assume deadlocks are rare and do nothing until they occur.
+
+		* If a deadlock occurs → system kills one process or reboots.
+		
+		* Used in many practical systems like UNIX, MySQL InnoDB.
+
+👉 Example:
+If T1 & T2 deadlock → system automatically rolls back one.
+
+✅ Pros: Simple, zero overhead.
+❌ Cons: Not suitable in real-time or high-load systems where deadlocks are frequent.
+
+---------------------------------------------------------------------------------------------------
+
+📘 Indexing and Its Types in DBMS
+🔹 Why Do We Need Indexing?
+
+Think of a 1,000-page textbook. If you want to find topic “XYZ”:
+ 
+   * Without Indexing → You must scan all 1,000 pages manually → time-consuming and frustrating.
+
+   * With Indexing → You open the index page, find “XYZ” → it tells you Pages 448-490. You directly go there.
+
+👉 Similarly, in databases:
+
+		* Indexing improves search efficiency.
+		
+		* It reduces the number of disk accesses needed to retrieve data.
+		
+		* Index table is always sorted.
+
+🔹 Key Concepts
+
+   * Search Key → Attribute used to find a record.
+	
+	* Data Access (Pointer) → Stores the address of the block/row where the record is located.
+
+👉 Index = (Search Key + Data Reference)
+
+🔹 Benefits of Indexing
+
+1.Improved Query Performance
+
+    DBMS doesn’t scan the whole table → directly locates rows.
+
+2.Optimizes ORDER BY & GROUP BY
+
+   If index exists on sorted/grouped column, DBMS avoids extra sorting.
+
+3.Reduced Disk I/O → Faster query execution.
+
+📌 Types of Indexing
+
+Indexes are classified into several types based on:
+
+		* How entries are stored
+		
+		* Which attributes are indexed
+		
+		* Whether ordering is maintained
+
+1️⃣ Sparse Index
+
+* Definition: Index does not store entry for every record. Instead → one entry per block/page.
+
+* Used when data is ordered (like primary key).
+
+* Saves space compared to dense index.
+
+👉 Example Table
+
+RollNo	Name
+1	   Ram
+2	  Shyam
+3	   Raghu
+4	  Riti
+5	  Raj
+6	  Rahul
+
+👉 Index Table (Sparse Index)
+
+Search Key	Data Ref
+1	        B1
+4	       B2
+
+👉 Blocks
+
+  * B1 → (1, 2, 3)
+
+  * B2 → (4, 5, 6)
+
+📍 Working:
+
+   * Search RollNo=5 → Index says “Go to Block B2” → then search inside block for exact record.
+
+✅ Advantages
+
+		* Less storage needed
+		
+		* Faster to maintain
+
+❌ Disadvantages
+
+		* Requires extra search inside block
+		
+		* Less efficient for random access
+
+📌 Use Cases
+
+		* Primary Indexing on large tables
+		
+		* Range Queries
+
+2️⃣ Dense Index
+
+	* Definition: Index contains an entry for every record.
+	
+	* Works well for unordered data.
+
+👉 Example Table
+
+Age	Name
+18	Ram
+18	Shyam
+19	Raghu
+20	Riti
+20	Raj
+21	Rahul
+
+👉 Index Table (Dense Index)
+
+Search Key	Data Ref
+18	        B1
+19	        B1
+20	        B2
+21     	    B2
+
+👉 Blocks
+
+* B1 → (18, 18, 19)
+
+* B2 → (20, 20, 21)
+
+📍 Working:
+
+   Search Age=20 → directly points to B2 and the record.
+
+✅ Advantages
+
+  Faster lookups (direct access to each record).
+
+❌ Disadvantages
+
+  * Storage intensive (large index file).
+
+   * Overhead when inserting/updating/deleting.
+
+📌 Use Cases
+
+		* Exact match queries
+		
+		* Smaller tables where speed matters
+
+3️⃣ Primary Index
+
+* Definition: Index built on the Primary Key (unique, sorted attribute).
+
+* Uses Sparse Indexing (since data is sorted).
+
+👉 Example Table
+
+RollNo Name
+1	  Ram
+2	  Shyam
+3	  Raghu
+4	  Riti
+5	  Raj
+6	  Rahul
+
+👉 Index Table (Primary Index)
+
+Search Key	Data Ref
+1	        B1
+4	        B2
+
+👉 Blocks
+
+* B1 → (1, 2, 3)
+
+* B2 → (4, 5, 6)
+
+📍 Use Case:
+
+   * Searching RollNo=5 → Index → B2 → record found quickly.
+
+✅ Efficient retrieval when searching via primary key.
+
+4️⃣ Clustered Index
+
+* Definition:
+
+		* Index built on a non-key attribute.
+		
+		* Records are physically stored in sorted order of index column.
+		
+		* Only one clustered index per table.
+
+* Often used with GROUP BY / ORDER BY queries.
+
+👉 Example Table (Clustered on Age)
+
+Age	Name
+18	Ram
+18	Shyam
+19	Raghu
+20	Riti
+20	Raj
+21	Rahul
+
+👉 Index Table
+
+Search Key	Data Ref
+18	   B1
+19	   B1
+20	   B2
+21	   B2
+
+📍 Example Use:
+
+  * In Employees table → Clustered index on LastName → rows stored in LastName order → no extra sorting needed for queries.
+
+5️⃣ Secondary Index
+
+* Definition:
+
+		* Index created on non-key or key attributes other than primary key.
+		
+		* Data may be unsorted.
+		
+		* Usually Dense Indexing is used.
+
+* Can be multiple secondary indexes in one table.
+
+👉 Case 1: Key Attribute, Unsorted Data
+
+Search Key	Data Ref
+18	        B1
+20      	B1
+22      	B2
+24      	B2
+
+👉 Case 2: Non-Key Attribute, Unsorted Data
+
+Search Key	Data Ref
+18	         B1
+18	        B1 → B2
+20      	B1
+22      	B2
+
+📍 Use Case: Searching using Name, Age, or other non-key columns.
+
+6️⃣ Multilevel Index
+
+* Definition: Used when the index itself becomes too large to fit in memory.
+
+* Index of an index (hierarchy).
+
+👉 How It Works
+
+* Level 1 (Inner Index) → Points to actual data blocks.
+
+* Level 2 (Outer Index) → Points to blocks of Level 1.
+
+👉 Example
+
+* Outer Index → (E101 → B1, E151 → B2)
+
+* Inner Index → inside B1: E101, E102 … E150
+
+📍 Use Case: Large databases with huge index files.
+
+7️⃣ Non-Clustered Index
+
+* Definition:
+
+		* Index exists separately from the table.
+		
+		* Contains pointers to data rows (row IDs).
+		
+		* Unlike clustered index → does not reorder physical storage.
+
+* Multiple non-clustered indexes possible per table.
+
+👉 Example:
+Table stored normally by RollNo, but we create a non-clustered index on Name.
+
+Index maps → Name → RowID.
+
+
