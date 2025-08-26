@@ -1853,3 +1853,437 @@ attribute should be true)
 6. If it fails at any of these steps decompose the table on a common attribute which is CK
 (lossless)
 --------------------------------------------------------------------------------------------------------
+
+🔹 Transaction in DBMS
+
+A transaction is a single logical unit of work that accesses and modifies the database.
+Example: In a banking system, transferring ₹500 from Account A to Account B involves:
+		
+		1.Read balance of A
+		
+		2.Subtract 500 from A
+		
+		3.Write updated balance of A
+		
+		4.Read balance of B
+		
+		5.Add 500 to B
+		
+		6.Write updated balance of B
+
+👉 All these steps together form a transaction.
+If any step fails (like power failure after step 3), the database should not lose consistency.
+
+ACID Properties in DBMS
+
+In Database Management Systems (DBMS), when we perform a transaction (a sequence of database operations like INSERT, UPDATE, DELETE), it must ensure data correctness, consistency, and reliability even in cases of failures (system crash, power failure, concurrent access, etc.).
+
+To guarantee this, DBMS follows the ACID properties:
+
+🔹 1. Atomicity
+
+* Meaning:
+		A transaction is all or nothing.
+		Either the entire transaction is executed successfully, or none of it is.
+
+* Example:
+		Imagine you are transferring ₹500 from Account A to Account B.
+		The transaction has 2 steps:
+
+		1.Deduct ₹500 from A.
+		
+		2.Add ₹500 to B.
+
+	*  If both succeed, transaction is committed.
+	
+	* If system crashes after step 1 but before step 2, DBMS must rollback step 1 (so A’s money isn’t lost).
+
+👉 Ensures no partial transaction happens.
+
+🔹 2. Consistency
+
+* Meaning:
+		A transaction must bring the database from one valid state to another valid state. Database integrity constraints must not be violated.
+
+* Example:
+
+		* Before transfer: A = ₹1000, B = ₹500 → Total = ₹1500
+		
+		* After transfer of ₹500: A = ₹500, B = ₹1000 → Total = ₹1500
+
+✔ Total money remains same (consistent).
+❌ If after the transaction total = ₹1200 or ₹1800, database is inconsistent.
+
+👉 Ensures rules, constraints, triggers, and data validity remain intact.
+
+🔹 3. Isolation
+
+* Meaning:
+  Multiple transactions happening at the same time should not interfere with each other.
+
+* Example:
+
+		* Transaction T1: Transfer ₹500 from A → B
+		
+		* Transaction T2: Check balance of A
+
+If both run concurrently:
+
+		* Without Isolation, T2 might see A’s balance after deduction but before addition → wrong result.
+		
+		* With Isolation, T2 executes as if it ran before or after T1, not in the middle.
+
+👉 Prevents dirty reads, non-repeatable reads, phantom reads (covered in Concurrency Control).
+
+🔹 4. Durability
+
+ Meaning:
+    Once a transaction is committed, its changes are permanent, even if the system crashes.
+
+ Example:
+
+		* If transfer from A → B is successful and committed,
+		
+		* Even if the system crashes right after, the updated balances are stored safely (using logs, backups, recovery mechanisms).
+
+👉 Ensures data is never lost after success.
+--------------------------------------------------------------------------------------------
+🔹 Concurrency in DBMS
+
+   * Concurrency means multiple transactions executing simultaneously in a multi-user database environment.
+
+   * Example: In a banking system, one user transfers money while another checks balance at the same time.
+
+Concurrency is good for performance ✅ but can cause problems (anomalies) if transactions interfere with each other.
+
+
+⚡ Problems without concurrency control:
+
+1. Lost Update Problem – Two transactions overwrite each other’s updates.
+Example:
+
+		* T1 reads balance = 1000, subtracts 200 → new = 800
+		
+		* T2 reads same balance = 1000, subtracts 100 → new = 900
+		
+		* Final balance should be 700, but ends up 900 → ❌ wrong.
+
+2.Dirty Read (Temporary Update Problem) – A transaction reads uncommitted changes of another.
+Example:
+
+		* T1 updates balance to 800 but crashes (rollback).
+		
+		* T2 reads 800 (wrong), while actual should remain 1000.
+
+3.Unrepeatable Read – A transaction reads the same data twice but gets different results.
+Example:
+
+		* T1 reads balance = 1000
+		
+		* T2 updates balance to 800 and commits
+		
+		* T1 reads again → 800 (inconsistent for T1).
+
+4.Phantom Read Problem
+
+* Happens when a transaction re-executes a query and finds different rows due to another transaction inserting/deleting rows.
+
+Example:
+		
+		* T1: SELECT * FROM students WHERE marks > 90 → gets 5 rows.
+		
+		* T2: Inserts a new student with marks 95 and commits.
+		
+		* T1 re-executes query → now gets 6 rows.
+		
+		* Result is inconsistent. ❌
+----------------------------------------------------------------------------------------
+
+🔹 What is a Schedule in DBMS?
+
+		* In a multi-user DBMS, several transactions execute concurrently.
+		
+		* Each transaction consists of a sequence of read/write operations.
+		
+		* A Schedule is an ordered sequence of operations (read, write, commit, abort) from multiple transactions, arranged in a way that preserves their order within each transaction.
+
+👉 In simple words: A schedule tells us how operations from different transactions are interleaved.
+
+🔹 Types of Schedules
+
+Schedules are broadly classified into two main categories:
+
+1. Serial Schedule
+
+		* A schedule in which transactions are executed one after the other without overlapping.
+		
+		* No interleaving of operations.
+		
+		* Always consistent but not efficient (low concurrency).
+
+✅ Example:
+Two transactions:
+
+		* T1 = {R1(A), W1(A)}
+		
+		* T2 = {R2(B), W2(B)}
+
+Serial Schedule:
+
+R1(A), W1(A), Commit1, R2(B), W2(B), Commit2
+
+
+Here T1 executes fully, then T2.
+
+2. Non-Serial Schedule
+
+		* A schedule where operations of different transactions are interleaved.
+		
+		* More efficient (higher concurrency) but may lead to inconsistency if not controlled.
+
+✅ Example:
+
+R1(A), R2(B), W1(A), W2(B), Commit1, Commit2
+
+
+Here T1 and T2 are interleaved.
+
+🔹 Categories of Schedules in Concurrency Control
+(A) Serializable Schedules
+
+A schedule is serializable if it produces the same result as a serial schedule.
+
+👉 Types of Serializability:
+
+1.Conflict Serializable
+
+  * Based on conflicting operations:
+
+     * Two operations conflict if:
+
+			* They belong to different transactions.
+			
+			* They access the same data item.
+			
+			* At least one is a write.
+
+* A conflict-serializable schedule can be transformed into a serial schedule by swapping non-conflicting operations.
+
+✅ Example:
+T1: R1(A), W1(A)
+T2: R2(A), W2(A)
+
+Schedule:
+
+R1(A), R2(A), W1(A), W2(A)
+
+
+This can be rearranged into a serial schedule, so it is conflict serializable.
+
+2. View Serializable
+
+   * A schedule is view serializable if it is view-equivalent to a serial schedule.
+
+    * Two schedules are view-equivalent if:
+
+			1.Same reads: Each read operation reads the same value in both schedules.
+			
+			2.Same writes: The final write on each data item is the same in both schedules.
+
+👉 Every conflict serializable schedule is view serializable, but not vice versa.
+
+(B) Recoverability in Schedules
+
+Recoverability deals with whether a failed transaction affects others.
+
+1.Recoverable Schedule
+
+		*  A schedule where a transaction commits only after the transaction it depends on has committed.
+		
+		* Prevents cascading aborts.
+
+✅ Example:
+If T2 reads a value written by T1, then T2 should commit only after T1 commits.
+
+2.Cascadeless Schedule
+
+		* A stricter form of recoverable schedule.
+		
+		* No transaction reads uncommitted data.
+		
+		* Prevents cascading rollbacks.
+
+3. Strict Schedule
+
+		* The strictest form.
+		
+		* Transactions cannot read or write a data item until the last transaction that wrote it has committed/aborted.
+		
+		* Prevents cascading aborts and ensures strictness.
+
+(C) Other Types of Schedules
+
+1.Complete Schedule
+
+		* Contains all operations (read, write, commit, abort) of all transactions.
+
+2.Irrecoverable Schedule
+		
+		* A schedule where a transaction commits before the one it depends on.
+		
+		 * Dangerous because rollback becomes impossible.
+
+🔹 Visual Example of Schedules
+Example Transactions:
+
+* T1: R1(A), W1(A)
+
+* T2: R2(A), W2(A)
+
+Serial Schedule:
+T1 → T2
+R1(A), W1(A), Commit1, R2(A), W2(A), Commit2
+
+Non-Serial, Conflict Serializable:
+R1(A), R2(A), W1(A), W2(A), Commit1, Commit2
+
+Non-Serializable (may cause inconsistency):
+R1(A), W2(A), W1(A), Commit2, Commit1
+
+
+Here final value of A depends on execution order → inconsistency.
+--------------------------------------------------------------------------------------------
+🔹 Concurrency Control Methods in DBMS
+
+Concurrency control methods are techniques used to ensure correct execution of concurrent transactions without violating data consistency, isolation, and integrity.
+
+The main goal is to avoid concurrency problems like dirty reads, lost updates, uncommitted data, and inconsistent data.
+
+✅ 1. Lock-Based Protocols
+
+A lock is a variable associated with a data item that describes the status of the item (locked/unlocked).
+Transactions must acquire a lock before accessing a data item.
+
+Types of Locks:
+
+ * Shared Lock (S):
+
+			* Multiple transactions can read (shared) the same item.
+			
+			* No transaction can write until all shared locks are released.
+			
+			* Example: T1 and T2 can both read Balance[X].
+
+ * Exclusive Lock (X):
+
+			* Only one transaction can both read and write the item.
+			
+			* Prevents all others from accessing until unlocked.
+			
+			* Example: T1 wants to update Balance[X], so T2 cannot read/write X until T1 releases lock.
+
+Two-Phase Locking (2PL) Protocol:
+
+  * Ensures serializability using locks.
+
+  * Has two phases:
+
+		1.Growing Phase: Transaction can acquire locks but cannot release.
+		
+		2.Shrinking Phase: Transaction releases locks but cannot acquire new ones.
+
+🔹 Example:
+
+		* T1 acquires lock on A, then B → updates.
+		
+		* Releases locks after finishing.
+		
+		* If T2 wants A, it must wait until T1 finishes.
+
+👉 Problem: Can lead to deadlock.
+
+✅ 2. Timestamp Ordering Protocol
+		
+		* Each transaction gets a timestamp (TS) when it starts.
+		
+		* TS decides the order of conflicting operations.
+
+Rules:
+
+   * If a younger transaction tries to access data already accessed by an older transaction in a conflicting way, the younger one is rolled back.
+
+🔹 Example:
+
+		* T1 (TS=1) and T2 (TS=2) both want to update X.
+		
+		* Since T1 is older, its write is allowed.
+		
+		* T2’s conflicting write may be rolled back.
+
+👉 Advantage: Avoids deadlock (no waiting).
+👉 Disadvantage: Many rollbacks if transactions conflict often.
+
+✅ 3. Validation (Optimistic Concurrency Control)
+
+Works in 3 phases:
+
+1.Read Phase → Transaction reads data into local workspace.
+
+2.Validation Phase → System checks if transaction conflicts with others.
+
+3.Write Phase → If validation passes, local changes are written to DB.
+
+🔹 Example:
+
+		* T1 reads A=100, adds 10 → A=110 (local).
+		
+		* T2 reads A=100, subtracts 20 → A=80 (local).
+		
+		* During validation: Conflict detected.
+		
+		* One transaction (say T2) is rolled back.
+
+👉 Useful in systems with low conflicts (like OLAP).
+
+✅ 4. Multiversion Concurrency Control (MVCC)
+
+		* Maintains multiple versions of a data item.
+		
+		* Readers read the latest committed version.
+		
+		* Writers create a new version instead of blocking readers.
+
+🔹 Example:
+
+		* T1 reads Salary=5000 (version V1).
+		
+		* T2 updates Salary to 6000 → creates V2.
+		
+		* T1 still sees V1 until it finishes.
+		
+		* Later, V2 becomes the latest.
+
+👉 Used in PostgreSQL, Oracle, MySQL InnoDB.
+👉 Advantage: Readers never block writers.
+
+✅ 5. Deadlock Handling Methods
+
+When using locks, deadlocks may occur. Handling methods are:
+
+1.Deadlock Prevention:
+		
+		* Impose an ordering of resources (transactions must request in order).
+		
+		* Or use wait-die / wound-wait schemes.
+
+2.Deadlock Detection & Recovery:
+
+		* Allow deadlocks.
+		
+		* Build a wait-for graph.
+		
+		* Detect cycles → abort a transaction.
+
+3.Deadlock Avoidance:
+
+   * Use Banker’s algorithm to avoid unsafe states.c
