@@ -1,1 +1,485 @@
 
+✅ OOPS (Object-Oriented Programming System)
+1. Definition
+
+OOP is a programming paradigm based on the concept of objects, which contain data (fields/attributes) and methods (functions/behaviors).
+It helps in building modular, reusable, and maintainable code.
+
+In Java → Everything is an object.
+
+✅ Four Main Types / Pillars of OOP
+🔹 1. Encapsulation (Data Hiding)
+
+   *  Wrapping data (variables) and code (methods) together into a single unit (class).
+    
+   *  Access is controlled using access modifiers (private, public, protected).
+    
+    * Prevents unauthorized access.
+
+👉 Real-Time Example:
+
+         * In a banking application, your account balance is not directly accessible.
+        
+       *  You can only access it using deposit/withdraw methods.
+        
+        * This protects the balance from unauthorized modification.
+
+Example (Encapsulation with Getter/Setter):
+
+class BankAccount {
+    private double balance;  // private → hidden data
+
+    // public getter and setter
+    public void setBalance(double amount) {
+        if (amount > 0) balance = amount;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        BankAccount acc = new BankAccount();
+        acc.setBalance(5000);   // secure update
+        System.out.println("Balance: " + acc.getBalance());
+    }
+}
+
+
+👉 Balance is hidden and accessed only via methods.
+
+🔹 2. Inheritance (Code Reusability)
+
+      * Mechanism where one class (child/subclass) inherits properties & methods from another class (parent/superclass).
+      
+    *   Promotes reusability and avoids duplicate code.
+      
+     *  Achieved using extends keyword in Java.
+
+👉 Real-Time Example:
+
+ * In a Ride-Sharing App (Uber/Ola),
+
+       * Vehicle is a parent class.
+
+        * Car, Bike, Auto inherit properties like start(), stop(), fuelType().
+
+
+Types of Inheritance in Java:
+
+    * Single (one parent → one child)
+
+   * Multilevel (grandparent → parent → child)
+
+   * Hierarchical (one parent → many children)
+
+  * ❌ Multiple inheritance (not supported with classes, only via interfaces).
+
+Example:
+
+class Vehicle {
+    void start() {
+        System.out.println("Vehicle is starting...");
+    }
+}
+
+class Car extends Vehicle {
+    void honk() {
+        System.out.println("Car is honking...");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Car car = new Car();
+        car.start();  // inherited from Vehicle
+        car.honk();
+    }
+}
+
+
+🔹 3. Polymorphism (Many Forms)
+
+One action behaves differently in different situations.
+
+Two types:
+
+1.Compile-time Polymorphism (Method Overloading)
+
+   * Same method name, different parameter list.
+
+2.Runtime Polymorphism (Method Overriding)
+
+    * Subclass provides a specific implementation of a method defined in superclass.
+
+
+👉 Real-Time Example:
+
+* In an E-commerce Payment System (Amazon, Flipkart),
+
+          * Payment can be done via CreditCard, UPI, NetBanking, Wallet.
+          
+         *  The method is the same → pay(), but implementation differs.
+
+Example (Overloading + Overriding):
+
+class Calculator {
+    int add(int a, int b) {
+        return a + b;
+    }
+    double add(double a, double b) { // Overloading
+        return a + b;
+    }
+}
+
+class Animal {
+    void sound() {
+        System.out.println("Animal makes sound");
+    }
+}
+class Dog extends Animal {
+    void sound() { // Overriding
+        System.out.println("Dog barks");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Calculator c = new Calculator();
+        System.out.println(c.add(2, 3));       // calls int version
+        System.out.println(c.add(2.5, 3.5));   // calls double version
+
+        Animal a = new Dog();
+        a.sound();   // Runtime → "Dog barks"
+    }
+}
+
+
+
+🔹 4. Abstraction (Hiding Implementation Details)
+
+* Hides internal implementation and shows only essential features.
+
+* Achieved using:
+
+    * Abstract classes (using abstract keyword).
+
+  * Interfaces (pure abstraction, from Java 8 → default & static methods).
+
+👉 Real-Time Example:
+
+ * In an ATM Machine,
+
+        * You press buttons like Withdraw, Deposit, Balance Inquiry.
+        
+       *  You don’t know how internally ATM communicates with the bank servers.
+        
+        * You just see the functionality (interface), not the implementation.
+
+Example:
+
+abstract class Shape {
+    abstract void draw();  // abstract method (no body)
+}
+
+class Circle extends Shape {
+    void draw() {
+        System.out.println("Drawing Circle");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Shape s = new Circle();
+        s.draw();   // abstraction → only know "draw()", not internal logic
+    }
+}
+----------------------------------------------------------------------------------------
+
+The 4 core features of Java that stand out are:
+
+1.Object-Oriented
+
+2.Platform Independent (WORA)
+
+3.Robust & Secure
+
+4.Multithreaded
+
+Let’s go one by one 👇
+
+✅ 1. Object-Oriented
+Meaning:
+
+        Java is based on the concept of Objects and Classes.
+        
+        Real-world entities (like Car, Employee, BankAccount) are modeled as objects.
+        
+        OOP principles (Encapsulation, Inheritance, Polymorphism, Abstraction) make the system modular, reusable, and maintainable.
+
+Real-Time Example:
+
+ In a Banking System,
+
+        Customer → object with data like name, balance.
+        
+        Account → object with deposit/withdraw methods.
+
+ These map directly into Java classes.
+
+Code Example:
+class Employee {
+    String name;
+    int salary;
+
+    void work() {
+        System.out.println(name + " is working");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Employee emp = new Employee();
+        emp.name = "John";
+        emp.salary = 50000;
+        emp.work();
+    }
+}
+
+
+👉 This shows how real-life entities are represented as objects.
+
+✅ 2. Platform Independent (Write Once, Run Anywhere)
+Meaning:
+
+        In Java, code is compiled into bytecode (.class file) by the Java compiler.
+        
+        This bytecode runs on the JVM (Java Virtual Machine), not directly on the OS.
+        
+        So the same Java program can run on Windows, Linux, Mac, Android — without rewriting.
+
+👉 Famous slogan: “Write Once, Run Anywhere (WORA)”.
+
+Real-Time Example:
+        
+        If a company builds an ERP system in Java, they don’t have to rewrite it separately for Windows, Linux, and macOS.
+        
+        They just ship the .class files, and JVM takes care of execution on different systems.
+
+Diagram (simplified):
+Java Code (.java) → javac → Bytecode (.class) → JVM → OS → Hardware
+
+Code Example:
+# Compile
+javac Hello.java   # produces Hello.class (bytecode)
+
+# Run (any OS with JVM installed)
+java Hello
+
+
+👉 This cross-platform support is one of the biggest reasons Java is so widely used.
+
+✅ 3. Robust & Secure
+Meaning:
+
+Robust (Strong): Java is designed to reduce runtime errors.
+
+        Automatic Garbage Collection → no memory leaks.
+        
+        Exception Handling → catches errors gracefully.
+        
+        No explicit pointers → prevents unsafe memory access.
+
+Secure: Java programs run inside the JVM sandbox.
+
+        Bytecode is verified before execution.
+        
+        Security Manager controls access to system resources.
+        
+        No pointer manipulation → prevents hacking/unauthorized memory access.
+
+Real-Time Example:
+
+        In Banking Applications (like SBI, HDFC net banking), security is critical.
+        
+        Java’s built-in security (no pointer misuse) and error handling make it safer compared to C/C++.
+
+Code Example (Robustness via Exception Handling):
+
+public class Main {
+    public static void main(String[] args) {
+        try {
+            int x = 10 / 0;  // risky code
+        } catch (ArithmeticException e) {
+            System.out.println("Error handled: " + e.getMessage());
+        }
+        System.out.println("Program continues...");
+    }
+}
+
+
+👉 Without handling, the program would crash. With exception handling, it runs smoothly.
+
+✅ 4. Multithreaded
+Meaning:
+
+          Java supports multithreading, i.e., running multiple tasks in parallel within a single program.
+          
+          Each thread runs independently but shares common resources.
+          
+          This makes applications faster and efficient.
+
+Real-Time Example:
+
+  In a video streaming app (like YouTube):
+
+            One thread → plays video.
+            
+            Another thread → downloads data.
+            
+            Another thread → listens for user input (pause/play).
+
+👉 All tasks run simultaneously, thanks to multithreading.
+
+Code Example:
+class MyThread extends Thread {
+    public void run() {
+        System.out.println("Thread running: " + Thread.currentThread().getName());
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        MyThread t1 = new MyThread();
+        MyThread t2 = new MyThread();
+        
+        t1.start();
+        t2.start();
+    }
+}
+
+
+👉 Output shows both threads running concurrently.
+
+
+---------------------------------------------------------------------------------------------------------
+JAVA
+1.What is loose coupling and strong coupling?
+
+✅ Interview-Style Answer
+1. Definition
+
+Coupling in Java means the degree of dependency between two classes or modules.
+
+It answers: “How much does Class A know about Class B?”
+
+👉 Two types:
+
+Tight (Strong) Coupling → High dependency.
+
+Loose Coupling → Low dependency.
+
+2. Strong (Tight) Coupling
+
+          One class is highly dependent on another class’s implementation.
+          
+          If one class changes, the other class must change too.
+          
+          This makes the system hard to maintain, extend, or test.
+Real-World Analogy: 
+
+A smartphone with a soldered, non-removable battery. If the battery dies, you can't just swap it out; you have to take the whole phone apart (modify the existing system) to replace it. The phone and battery are tightly coupled.
+
+Example (Tight Coupling without interfaces):
+
+class PetrolEngine {
+    void start() {
+        System.out.println("Petrol Engine Starting...");
+    }
+}
+
+class Car {
+    PetrolEngine engine;  // directly depends on PetrolEngine
+
+    Car() {
+        engine = new PetrolEngine(); // strong coupling
+    }
+
+    void startCar() {
+        engine.start();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Car car = new Car();
+        car.startCar();  // Works only with PetrolEngine
+    }
+}
+
+
+❌ Problem → If tomorrow we want a DieselEngine, we must modify the Car class. This shows tight coupling.
+
+3. Loose Coupling
+
+      One class depends only on abstraction (interface/abstract class), not a concrete implementation.
+      
+      We can change implementations without modifying the dependent class.
+      
+      This makes the system flexible, reusable, testable, and maintainable.
+
+Real-World Analogy:
+
+A standardized power socket. Your lamp (the Car) is designed to work with any device that plugs into the socket and provides electricity (the Engine interface). You can plug in a halogen bulb (PowerfulEngine), an LED bulb (ElectricEngine), or even a night light (TestEngine) without rewiring the lamp itself. The socket defines the contract (voltage, plug shape).
+
+Example (Loose Coupling using Interface):
+
+// Abstraction
+interface Engine {
+    void start();
+}
+
+// Implementations
+class PetrolEngine implements Engine {
+    public void start() {
+        System.out.println("Petrol Engine Starting...");
+    }
+}
+
+class DieselEngine implements Engine {
+    public void start() {
+        System.out.println("Diesel Engine Starting...");
+    }
+}
+
+// Car depends only on abstraction
+class Car {
+    private Engine engine;
+
+    // Dependency Injection
+    Car(Engine engine) {
+        this.engine = engine;
+    }
+
+    void startCar() {
+        engine.start();
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Engine petrol = new PetrolEngine();
+        Car car1 = new Car(petrol);
+        car1.startCar();
+
+        Engine diesel = new DieselEngine();
+        Car car2 = new Car(diesel);
+        car2.startCar();
+    }
+}
+
+
+✅ Advantage → Car doesn’t care if it’s PetrolEngine, DieselEngine, or ElectricEngine.
+We can add new engines without modifying Car → Loose Coupling.
