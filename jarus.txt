@@ -483,3 +483,865 @@ public class Main {
 
 ✅ Advantage → Car doesn’t care if it’s PetrolEngine, DieselEngine, or ElectricEngine.
 We can add new engines without modifying Car → Loose Coupling.
+
+---------------------------------------------------------------------------------------------------------
+
+ 2. Data Structure mainly Trees concept
+
+1. What is a Tree?
+A Tree is a non-linear data structure that simulates a hierarchical tree structure. It's a collection of entities called nodes connected by edges. Each node contains a value and references to its children.
+
+Why is it non-linear? Unlike arrays or linked lists which have a strict linear sequence, trees branch out, allowing for faster access and insertion/deletion than linear structures.
+
+2. Key Terminology
+Root: The topmost node in a tree (Node A in the diagram below).
+
+Parent/Child: A node connected to another node when moving away from the Root. (A is the parent of B and C. B and C are children of A).
+
+Siblings: Nodes with the same parent (B and C are siblings).
+
+Leaf (External) Node: A node with no children (D, E, F).
+
+Internal Node: A node with at least one child (A, B, C).
+
+Edge: The link connecting two nodes.
+
+Path: A sequence of nodes and edges connecting a node with a descendant.
+
+Depth: The number of edges from the root to the node. (Depth of A is 0, depth of B is 1).
+
+Height: The number of edges on the longest path from the node to a leaf. (Height of the tree is the height of the root. Height of B is 1, height of A is 2).
+
+Subtree: A tree consisting of a node and all of its descendants.
+
+Visual Representation:
+
+text
+        A  (Root, Depth=0, Height=2)
+       / \
+      B   C (Siblings, Depth=1)
+     / \   \
+    D   E   F (Leaves, Depth=2)
+    (Height=0)
+3. Why are Trees Important? (Real-Time Examples)
+File Systems: The directories and folders on your computer form a tree structure. The root directory (C:\ or /) has sub-directories (Program Files, Users), which themselves have more sub-directories.
+
+Domain Name System (DNS): The organization of domain names (com, org, google, www) is a tree, allowing for efficient routing of internet traffic.
+
+Organization Hierarchy: The CEO at the root, followed by VPs, managers, and employees. This is a classic tree.
+
+JARUS-specific Example - Decision Making for Drones:
+An autonomous drone uses a tree structure called a Behavior Tree to make decisions.
+
+The root node might be "Complete Delivery".
+
+Its children could be "Navigate to Destination" and "Handle Obstacle".
+
+"Navigate to Destination" might have children like "Calculate Path", "Maintain Altitude", and "Check Battery".
+
+This allows the drone to traverse the tree, making complex decisions based on environmental inputs (e.g., if an obstacle is detected, it moves to the "Handle Obstacle" branch).
+
+4. Common Types of Trees (From Most to Least Important for Interviews)
+a) Binary Tree
+A tree where each node has at most two children, typically referred to as the left child and right child.
+
+java
+class TreeNode {
+    int value;
+    TreeNode left;  // Reference to left child
+    TreeNode right; // Reference to right child
+
+    TreeNode(int value) {
+        this.value = value;
+        this.right = null;
+        this.left = null;
+    }
+}
+b) Binary Search Tree (BST)
+A Binary Tree with a special ordering property:
+
+For any node, all values in its left subtree are less than the node's value.
+
+All values in its right subtree are greater than the node's value.
+
+This property enables very efficient searching, insertion, and deletion (Average Time: O(log n)).
+
+Example:
+
+text
+        10
+       /  \
+      5    15
+     / \     \
+    3   7     20
+Searching for 7: Start at 10 -> go left to 5 -> go right to 7 (Found!).
+
+c) Balanced vs. Unbalanced Trees
+Balanced (e.g., AVL, Red-Black Trees): A tree where the height of the left and right subtrees of any node differ by at most 1. This ensures operations remain O(log n).
+
+Unbalanced: A tree that can degenerate into a linked list in the worst case, making operations O(n).
+
+text
+// An unbalanced BST (worst-case scenario - just a linked list)
+1
+ \
+  2
+   \
+    3
+     \
+      4
+d) Other Important Types
+Trie (Prefix Tree): Specialized for storing strings. Used for autocomplete features and IP routing. Each node represents a character.
+
+Heap: A complete binary tree where each node is greater (max-heap) or smaller (min-heap) than its children. Used for efficient priority queues and sorting (Heapsort).
+
+B-Tree / B+ Tree: Trees with more than two children per node. Crucial for database indexing and file systems because they minimize disk I/O.
+
+5. Tree Traversals (VISITING EVERY NODE)
+This is a very common interview question. The four main ways to traverse a binary tree:
+
+1. Inorder (Left, Root, Right)
+
+Result: Visits nodes in ascending order in a BST.
+
+Code:
+
+java
+void inorderTraversal(TreeNode node) {
+    if (node == null) return;
+    inorderTraversal(node.left);   // 1. Traverse left subtree
+    System.out.print(node.value + " "); // 2. Visit the root
+    inorderTraversal(node.right);  // 3. Traverse right subtree
+}
+// Output for the BST example: 3, 5, 7, 10, 15, 20
+2. Preorder (Root, Left, Right)
+
+Use Case: Good for creating a copy of the tree.
+
+Code:
+
+java
+void preorderTraversal(TreeNode node) {
+    if (node == null) return;
+    System.out.print(node.value + " "); // 1. Visit the root
+    preorderTraversal(node.left);   // 2. Traverse left subtree
+    preorderTraversal(node.right);  // 3. Traverse right subtree
+}
+// Output: 10, 5, 3, 7, 15, 20
+3. Postorder (Left, Right, Root)
+
+Use Case: Good for deleting the tree (you delete children before the parent).
+
+Code:
+
+java
+void postorderTraversal(TreeNode node) {
+    if (node == null) return;
+    postorderTraversal(node.left);  // 1. Traverse left subtree
+    postorderTraversal(node.right); // 2. Traverse right subtree
+    System.out.print(node.value + " "); // 3. Visit the root
+}
+// Output: 3, 7, 5, 20, 15, 10
+4. Level Order (Breadth-First Search - BFS)
+
+How: Uses a queue. Visit nodes level by level.
+
+Code:
+
+java
+void levelOrderTraversal(TreeNode root) {
+    if (root == null) return;
+    Queue<TreeNode> queue = new LinkedList<>();
+    queue.add(root);
+
+    while (!queue.isEmpty()) {
+        TreeNode currentNode = queue.poll();
+        System.out.print(currentNode.value + " ");
+
+        if (currentNode.left != null) queue.add(currentNode.left);
+        if (currentNode.right != null) queue.add(currentNode.right);
+    }
+}
+// Output: 10, 5, 15, 3, 7, 20
+------------------------------------------------------------------------------------------------------------
+ 3. What is input and output buffering?
+
+🔹 What is Buffering?
+
+A buffer is just a temporary memory (like a box) that stores data while it is being transferred between two places (like between a program and a file, or program and network).
+
+The idea is: instead of sending/receiving data one small piece at a time (which is slow), we collect data in the buffer and then send/receive in bulk (faster).
+
+🔹 Input Buffering
+
+Definition: Input buffering means when we read data (like from a file, keyboard, or network), it is first stored in a buffer in memory. The program then reads from that buffer instead of directly from the device.
+
+Why? Because reading data directly from devices (like disk or keyboard) is slow compared to memory operations.
+
+So buffering reduces the number of device accesses and speeds up input.
+
+✅ Example 1 (Keyboard input):
+When you type on the keyboard, the characters don’t directly go to your program.
+They are first collected in a buffer (usually until you press Enter). Then the program reads the whole line from the buffer.
+
+✅ Example 2 (File Input in Java):
+
+import java.io.*;
+
+public class InputBufferExample {
+    public static void main(String[] args) throws Exception {
+        FileReader fr = new FileReader("data.txt");
+        BufferedReader br = new BufferedReader(fr); // Input buffering
+
+        String line;
+        while((line = br.readLine()) != null) {
+            System.out.println(line);
+        }
+        br.close();
+    }
+}
+
+
+Here, instead of reading the file character by character (slow),
+BufferedReader reads a big chunk of data at once into memory and gives it line by line → Faster.
+
+🔹 Output Buffering
+
+Definition: Output buffering means when we write data (to file, screen, or network), it is not written immediately. Instead, it is stored in a buffer and written all at once when the buffer is full or explicitly flushed.
+
+Why? Because writing data to devices (disk, printer, network) is slow. Buffering makes it efficient.
+
+✅ Example 1 (System.out.print in Java):
+When you use System.out.print("Hello"), sometimes it does not appear instantly on the console until you call System.out.flush() or print a newline (println). That’s because of output buffering.
+
+✅ Example 2 (File Output in Java):
+
+import java.io.*;
+
+public class OutputBufferExample {
+    public static void main(String[] args) throws Exception {
+        FileWriter fw = new FileWriter("output.txt");
+        BufferedWriter bw = new BufferedWriter(fw); // Output buffering
+
+        bw.write("Hello, this is written using buffering!");
+        bw.newLine();
+        bw.write("Data is stored in buffer first.");
+        
+        bw.flush(); // flush buffer to file
+        bw.close();
+    }
+}
+
+
+Here, data is first written to the buffer.
+Only when we call flush() or close(), the buffer contents go to the file.
+
+🔹 Real-Life Analogy (Easy to Remember in Interview)
+
+Imagine writing letters and sending them by courier:
+
+Without buffering → You send each letter one by one (slow, costly).
+
+With buffering → You collect all letters in an envelope (buffer) and send them together (fast, efficient).
+
+Similarly:
+
+Input buffering = Receiving courier packages in bulk, then reading inside one by one.
+
+Output buffering = Collecting letters in an envelope before sending out.
+
+✅ Interview Point:
+
+Input/Output buffering is mainly used to improve performance by minimizing the number of slow I/O operations.
+
+In Java, classes like BufferedReader, BufferedWriter, BufferedInputStream, and BufferedOutputStream use buffering.
+
+-----------------------------------------------------------------------------------------------------------
+
+ 4. Java collections and why hashing is not included in collections?
+
+Java Collections Framework
+
+Definition:
+Java Collections Framework (JCF) is a set of interfaces and classes that provide ready-made data structures (like List, Set, Queue, Map) and algorithms (like sorting, searching).
+
+Goal: To make data storage, retrieval, and manipulation easier with reusable, consistent APIs.
+
+👉 Main interfaces in Collections:
+
+List – Ordered collection, allows duplicates (e.g., ArrayList, LinkedList).
+
+Set – Unique elements, no duplicates (e.g., HashSet, TreeSet).
+
+Queue – Follows FIFO, supports priority (e.g., PriorityQueue, LinkedList).
+
+Map – Key-value pairs (e.g., HashMap, TreeMap).
+
+Why Hashing is NOT directly part of Collections?
+
+This is a tricky part—interviewers ask to see if you know the design perspective of Java.
+
+🔹 1. Collections Framework is about "Collection of Objects"
+
+Collection interface (root of the hierarchy) represents a group of individual objects (like a bag of items).
+
+Hashing is not a collection type, it is an algorithm/technique used for fast data access.
+
+👉 Example:
+
+ArrayList, LinkedList, HashSet → all store objects.
+
+But hashing is not a container; it’s a mechanism to organize and access data quickly.
+
+🔹 2. Maps (like HashMap, Hashtable) do use hashing
+
+Map is not a sub-interface of Collection (different hierarchy).
+
+Why? Because a map stores key-value pairs, while a collection stores individual objects.
+
+Hashing is implemented inside Map classes (like HashMap, Hashtable), but hashing itself is not exposed as a "collection".
+
+👉 Example:
+
+Map<String, Integer> studentMarks = new HashMap<>();
+studentMarks.put("Alice", 85);
+studentMarks.put("Bob", 90);
+
+// Hashing is used internally to store/retrieve values quickly
+System.out.println(studentMarks.get("Alice")); // O(1) lookup
+
+
+Here, hashing is working inside HashMap, but you don’t see it directly in Collections.
+
+🔹 3. Design Principle (Separation of Concerns)
+
+Collections = data structures
+
+Hashing = algorithm for storage/retrieval
+
+If Java added "Hashing" as part of Collections, it would mix abstraction levels (data structures vs. algorithms).
+
+That’s why Java designers kept hashing hidden inside implementation classes (HashMap, HashSet, Hashtable).
+
+✅ Interview Answer (Crisp & Clear)
+
+Java Collections Framework provides interfaces and classes like List, Set, Queue, and Map to store and manipulate groups of objects. Hashing, however, is not included directly because it is not a data structure by itself, but a technique used internally to achieve fast access in classes like HashMap, HashSet, and Hashtable. Also, Collection deals with individual objects, whereas Map stores key-value pairs, so Map is kept separate from the Collection hierarchy. This separation maintains clean design and abstraction.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+Java Collections Framework Hierarchy
+
+In Java, the Collections Framework is divided into two main parts:
+
+Collection Interface (java.util.Collection) → for working with groups of objects.
+
+Sub-interfaces: List, Set, Queue, Deque
+
+Map Interface (java.util.Map) → for working with key-value pairs.
+
+Not a child of Collection, but part of the framework.
+
+Hierarchy Diagram (Textual Representation)
+              Iterable (I)
+                  |
+            -----------------
+            |               |
+         Collection (I)     Map (I)
+            |                  
+   -------------------------
+   |           |           |
+  List (I)    Set (I)     Queue (I)
+   |           |            |
+ArrayList    HashSet      PriorityQueue
+LinkedList   TreeSet      ArrayDeque
+Vector       LinkedHashSet
+Stack
+
+Breakdown
+1. Iterable (Root Interface)
+
+Super interface of all collection classes.
+
+Defines the method iterator() for iteration (used in enhanced for-loop).
+
+2. Collection Interface
+
+Defines core methods like add(), remove(), size(), clear(), etc.
+
+Sub-interfaces of Collection:
+
+List (Ordered, Allows Duplicates)
+
+Implementations: ArrayList, LinkedList, Vector, Stack
+
+Set (Unordered, No Duplicates)
+
+Implementations: HashSet, LinkedHashSet, TreeSet
+
+Queue (FIFO order, Can allow duplicates)
+
+Implementations: PriorityQueue, ArrayDeque, LinkedList
+
+3. Map Interface (Key-Value Pairs, No duplicate keys)
+
+Implementations:
+
+HashMap, LinkedHashMap, TreeMap, Hashtable
+
+✅ Key Notes for Interview
+
+Map is not a child of Collection, but it’s part of the Collections Framework.
+
+Collection → works with elements.
+
+Map → works with key-value pairs.
+
+List → preserves order, allows duplicates.
+
+Set → no duplicates.
+
+Queue → follows FIFO/LIFO depending on implementation.
+-----------------------------------------------------------------------------------------------------
+ 5. What are annotations in Java?
+
+What are Annotations in Java?
+
+Annotations in Java are metadata (extra information) that you can add to your code.
+They do not directly affect program logic, but they provide instructions to the compiler, runtime, or frameworks.
+
+Think of annotations as labels or tags you put on your code, so that tools or libraries can understand how to treat it.
+
+Types of Annotations in Java
+
+Java provides three main categories:
+
+Built-in Annotations (provided by Java)
+
+@Override → tells the compiler a method is overriding a superclass method.
+
+@Deprecated → marks a method/class as outdated.
+
+@SuppressWarnings → tells compiler to ignore warnings.
+
+Meta-Annotations (annotations for annotations)
+
+@Retention → tells how long the annotation is retained (source, class, runtime).
+
+@Target → defines where annotation can be applied (method, class, field).
+
+@Inherited → allows subclasses to inherit annotations.
+
+Custom Annotations (user-defined)
+
+You can create your own annotation using @interface.
+
+Examples
+1. Built-in Annotation Example
+class Parent {
+    void display() {
+        System.out.println("Parent display");
+    }
+}
+
+class Child extends Parent {
+    @Override   // ensures overriding is correct
+    void display() {
+        System.out.println("Child display");
+    }
+}
+
+
+✅ If you misspell display (like dispaly), the compiler throws an error because of @Override.
+
+2. @Deprecated Example
+class OldCode {
+    @Deprecated
+    void oldMethod() {
+        System.out.println("This method is deprecated");
+    }
+}
+
+class Test {
+    public static void main(String[] args) {
+        OldCode obj = new OldCode();
+        obj.oldMethod(); // compiler shows warning
+    }
+}
+
+
+👉 This warns developers that oldMethod() should not be used anymore.
+
+3. Custom Annotation Example
+import java.lang.annotation.*;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+@interface MyAnnotation {
+    String author() default "Unknown";
+    int version() default 1;
+}
+
+class Demo {
+    @MyAnnotation(author = "Yakanna", version = 2)
+    public void myMethod() {
+        System.out.println("Custom Annotation Example");
+    }
+}
+
+
+Here we created a custom annotation @MyAnnotation and applied it to a method.
+Frameworks like Spring, Hibernate use custom annotations heavily (e.g., @Autowired, @Entity, @RestController).
+
+Interview Key Points
+
+Annotations = Metadata (information about code).
+
+They don’t change execution but guide compiler, runtime, or frameworks.
+
+Used in frameworks (Spring Boot, JPA, Hibernate). Example:
+
+@Entity → tells Hibernate this class maps to a database table.
+
+@Autowired → tells Spring to inject a dependency.
+
+🔥 Real-World Example:
+
+In Spring Boot, instead of writing XML configs, we just use annotations:
+
+@RestController
+public class UserController {
+    @GetMapping("/users")
+    public String getUsers() {
+        return "List of Users";
+    }
+}
+
+
+Here:
+
+@RestController → tells Spring this is a REST controller.
+
+@GetMapping("/users") → maps HTTP GET request to getUsers() method.
+
+----------------------------------------------------------------------------------------------------------------
+
+ 6. Whyis spring boot and framework introduced in Java?
+
+The Problem: "Why was it needed?"
+Imagine building a large, complex enterprise application for banking, e-commerce, or a company like JARUS (with drones, logistics, etc.) using only core Java (Java SE). You would face several major challenges:
+
+Tight Coupling: Business logic (e.g., OrderService) would be directly instantiated with new inside other classes (e.g., OrderController). This makes the code rigid, hard to test, and difficult to modify.
+
+java
+// WITHOUT SPRING - Tightly Coupled, Hard to Test
+public class OrderController {
+    // The controller is hardcoded to use this specific service
+    private OrderService orderService = new OrderService();
+
+    public void processOrder() {
+        orderService.process();
+    }
+}
+Bolierplate Code: Common tasks like transaction management, security, and logging required writing the same repetitive, verbose code in every project.
+
+java
+// Manual Transaction Management Boilerplate (Simplified)
+Connection conn = null;
+try {
+    conn = dataSource.getConnection();
+    conn.setAutoCommit(false); // Begin transaction
+
+    // ... business logic ...
+
+    conn.commit(); // Commit transaction
+} catch (SQLException e) {
+    if (conn != null) conn.rollback(); // Rollback on error
+} finally {
+    if (conn != null) conn.close();
+}
+Painful Integration: Getting different technologies (e.g., Hibernate for ORM, Tomcat as a server, Jackson for JSON) to work together required a lot of manual configuration and wiring.
+
+Configuration Hell: Managing dependencies and their versions using build tools like Ant or early Maven was complex. Configuring applications involved massive, unwieldy XML files.
+
+In short, developers were spending more time on "plumbing" code (wiring things together) than on writing actual business logic (solving the real problem).
+
+The Solution Part 1: Spring Framework
+The Spring Framework was introduced to address these issues by providing a comprehensive programming and configuration model for modern Java-based enterprise applications.
+
+Its core power comes from two principles:
+
+Dependency Injection (DI) / Inversion of Control (IoC):
+This is the heart of Spring. Instead of a class creating its own dependencies (new OrderService()), the dependencies are injected into it by the Spring IoC Container. The container is a framework that manages objects ("beans") and their life cycle.
+
+How it solves coupling:
+
+java
+// WITH SPRING - Loosely Coupled, Easy to Test
+@Controller
+public class OrderController {
+
+    // The dependency is declared but not created here
+    @Autowired
+    private OrderService orderService; // Spring injects this!
+
+    public void processOrder() {
+        orderService.process();
+    }
+}
+
+@Service
+public class OrderService {
+    // Spring will automatically create one instance (a Singleton) of this service
+}
+Result: OrderController is no longer tied to OrderService. You can easily swap the implementation for testing (e.g., inject a MockOrderService) or for different environments.
+
+Aspect-Oriented Programming (AOP):
+Spring allows you to define cross-cutting concerns—functionality that applies across many parts of the application (like logging, security, transactions)—separately from the business logic. Spring then weaves them together automatically.
+
+How it solves boilerplate:
+You can declare a transaction requirement declaratively with an annotation, and Spring handles the boilerplate code shown earlier.
+
+java
+@Service
+public class BankService {
+
+    @Transactional // <- That's it! Spring handles begin/commit/rollback.
+    public void transferMoney(Account from, Account to, double amount) {
+        // ... your pure business logic here ...
+        withdraw(from, amount);
+        deposit(to, amount);
+    }
+}
+What Spring Framework provided: A powerful, flexible toolbox for building enterprise apps by promoting loose coupling and reducing boilerplate.
+
+The Solution Part 2: Spring Boot
+Spring Framework was powerful, but it came with a cost: Complex Configuration. You still had to spend significant time writing XML or Java configuration to set up the framework itself, choose compatible library versions, and deploy your application.
+
+Spring Boot was introduced to make Spring itself easier to use. Its mantra is "convention over configuration."
+
+Spring Boot's key features:
+
+Auto-Configuration: Spring Boot automatically configures your application based on the libraries (JARs) it finds on the classpath. If it sees H2 database in the classpath, it auto-configures an in-memory datasource. If it sees Spring MVC, it auto-configures a web server (Tomcat by default). You only need to override this configuration if you want non-default behavior.
+
+Standalone Applications: Spring Boot allows you to package your application as a single, executable JAR file that has an embedded web server (Tomcat, Jetty, or Undertow). You don't need to deploy a WAR file to an external Tomcat server. You can just run java -jar myapp.jar.
+
+Starter Dependencies: Simple Maven descriptors that bundle all the necessary dependencies for a specific functionality.
+
+Need a web app? Add spring-boot-starter-web.
+
+Need data access? Add spring-boot-starter-data-jpa.
+
+Need security? Add spring-boot-starter-security.
+This eliminates version conflicts and dependency hell.
+
+Production-Ready Features: It provides built-in tools like Spring Boot Actuator for monitoring your application (health checks, metrics, info) and Spring Boot DevTools for fast developer restarts.
+
+Real-Time Analogy
+Core Java: Building a car from scratch. You have to manufacture every single screw, wire the electronics, and build the engine yourself. It's flexible but incredibly time-consuming.
+
+Spring Framework: A kit car. You get a pre-built chassis, engine, and wiring harness (the Spring modules). You still have to assemble and connect all the parts yourself (the configuration), but you didn't have to forge the metal.
+
+Spring Boot: A fully assembled, production-ready car. You just get in, turn the key, and drive. The "conventions" (the standard design) are already chosen for you, but you can still customize the paint and seats if you want.
+
+Summary: Why They Were Introduced
+Spring Framework	Spring Boot
+Primary Goal	To solve application development complexity by enabling loose coupling and reducing boilerplate code via DI and AOP.	To solve Spring's configuration complexity and simplify deployment.
+Key Concept	Dependency Injection & Aspect-Oriented Programming	Auto-Configuration & Convention Over Configuration
+Analogy	A powerful toolbox with all the best tools.	A pre-assembled product built with those tools.
+For an interview at JARUS: You can conclude by saying that these technologies allow developers to focus on the unique business logic of the domain (e.g., drone flight paths, logistics algorithms, sensor data processing) instead of the underlying plumbing, leading to more robust, maintainable, and faster-developed applications.
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+7. Write example for dynamic polymorphism
+
+Dynamic Polymorphism in Java
+
+👉 Definition:
+Dynamic polymorphism (also called Runtime Polymorphism) is when a method call is resolved at runtime instead of compile time.
+This happens using method overriding (not method overloading).
+
+Method Overloading = Compile-time polymorphism.
+
+Method Overriding = Runtime polymorphism (dynamic).
+
+Example of Dynamic Polymorphism
+// Parent class
+class Animal {
+    void sound() {
+        System.out.println("Animal makes a sound");
+    }
+}
+
+// Child class
+class Dog extends Animal {
+    @Override
+    void sound() {
+        System.out.println("Dog barks");
+    }
+}
+
+// Another child class
+class Cat extends Animal {
+    @Override
+    void sound() {
+        System.out.println("Cat meows");
+    }
+}
+
+public class DynamicPolymorphismExample {
+    public static void main(String[] args) {
+        Animal a;  // reference of parent class
+
+        a = new Dog();   // object of Dog
+        a.sound();       // Output: Dog barks
+
+        a = new Cat();   // object of Cat
+        a.sound();       // Output: Cat meows
+    }
+}
+
+Explanation
+
+We have a parent class (Animal) and child classes (Dog, Cat) that override the sound() method.
+
+The parent class reference Animal a; can hold any child class object.
+
+Which method gets executed depends on the object type at runtime, not the reference type.
+
+👉 That’s why it is called Dynamic (Runtime) Polymorphism.
+
+Real-Life Example
+
+Think of a remote control (parent).
+
+The same remote (reference) can control TV, AC, or Music System (child objects).
+
+The button pressed (method call) will behave differently depending on which device is connected.
+
+✅ Interview Tip:
+When asked this question, always explain the difference between compile-time polymorphism (method overloading) and runtime polymorphism (method overriding), then write a method overriding example like above.
+
+------------------------------------------------------------------------------------------------------------------------------
+
+ 8. Tell me about Finalize keyword
+
+🔹 What is finalize in Java?
+
+In Java, finalize() is a method in the Object class.
+It is called by the Garbage Collector (GC) before destroying an object to allow the object to clean up resources (like closing files, releasing memory, disconnecting from networks, etc.).
+
+👉 Think of it like a “last chance cleanup” before the object is deleted from memory.
+
+
+2. How was it supposed to work?
+The concept was part of Java's original design for resource management. The idea was:
+
+When an object becomes eligible for garbage collection (i.e., no more live references point to it), the Garbage Collector is scheduled to run.
+
+Before actually deleting the object and reclaiming its memory, the GC would call the object's finalize() method.
+
+Inside the finalize() method, the object could release critical system resources that it was holding, such as:
+
+File handles (FileInputStream, FileOutputStream)
+
+Network sockets
+
+Database connections
+
+Native resources (memory allocated outside the JVM, e.g., through JNI)
+
+
+🔹 Syntax of finalize()
+protected void finalize() throws Throwable {
+    // cleanup code
+}
+
+
+It is protected → So that subclasses can override it.
+
+It can throw exceptions.
+
+It is defined in java.lang.Object, so every class in Java can override it.
+
+🔹 When is finalize() called?
+
+When the Garbage Collector decides that an object is no longer reachable (no references exist).
+
+Before the object’s memory is reclaimed, finalize() (if overridden) is called once.
+
+⚠️ Important:
+
+You cannot predict when finalize() will be called.
+
+It may never be called if the program exits before GC runs.
+
+🔹 Example of finalize()
+class Demo {
+    String name;
+
+    Demo(String name) {
+        this.name = name;
+    }
+
+    // Override finalize method
+    @Override
+    protected void finalize() throws Throwable {
+        System.out.println("Finalize called for: " + name);
+    }
+}
+
+public class FinalizeExample {
+    public static void main(String[] args) {
+        Demo d1 = new Demo("Object1");
+        Demo d2 = new Demo("Object2");
+
+        d1 = null; // eligible for GC
+        d2 = null; // eligible for GC
+
+        System.gc(); // Request JVM to run Garbage Collector
+
+        System.out.println("Main method completed.");
+    }
+}
+
+✅ Output (may vary):
+Main method completed.
+Finalize called for: Object2
+Finalize called for: Object1
+
+
+(Notice: The order is not guaranteed.)
+
+🔹 Why is finalize() discouraged?
+
+Unpredictable: You don’t know when or if it will run.
+
+Performance cost: It makes Garbage Collection slower.
+
+Deprecated: Since Java 9, finalize() is marked as deprecated because better resource management techniques exist.
+
+🔹 Best Alternative to finalize()
+
+Instead of using finalize(), we should use:
+
+try-with-resources (Java 7+) → Automatically closes resources like files, DB connections.
+
+AutoCloseable interface → Custom cleanup logic.
+
+Explicit cleanup methods → Example: close(), disconnect(), etc.
+
+🔹 Real-life Analogy 🚗
+
+Think of finalize() like a car scrap process:
+
+When your car is no longer usable (object not referenced), it goes to a scrap yard (GC).
+
+Before scrapping, you may want to remove the stereo system or personal items (cleanup in finalize()).
+
+But you don’t know exactly when the car will be scrapped → Same unpredictability with finalize().
+
+
+
+The Bottom Line for Your Interview
+"The finalize method was an old, flawed idea for cleanup in Java. You couldn't rely on it because it might run too late or not at all. It's now deprecated. Today, we always use try-with-resources because it makes cleanup immediate and predictable."
+
+
+
