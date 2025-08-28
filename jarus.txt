@@ -1342,6 +1342,217 @@ But you don’t know exactly when the car will be scrapped → Same unpredictabi
 
 The Bottom Line for Your Interview
 "The finalize method was an old, flawed idea for cleanup in Java. You couldn't rely on it because it might run too late or not at all. It's now deprecated. Today, we always use try-with-resources because it makes cleanup immediate and predictable."
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ 9. What is the relationship between classes in java?
 
 
+🔹 Relationship Between Classes in Java
 
+In Java, classes relate to each other mainly in two broad ways:
+
+IS-A Relationship (Inheritance)
+
+HAS-A Relationship (Association/Composition/Aggregation)
+
+1. IS-A Relationship (Inheritance)
+
+This means one class is a subtype of another.
+
+Implemented using extends (for classes) and implements (for interfaces).
+
+It represents specialization: Child class extends Parent class to reuse and add functionality.
+
+✅ Example:
+
+class Vehicle {
+    void start() {
+        System.out.println("Vehicle starting...");
+    }
+}
+
+class Car extends Vehicle {  // IS-A relationship
+    void playMusic() {
+        System.out.println("Playing music...");
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        Car c = new Car();
+        c.start();       // Inherited from Vehicle
+        c.playMusic();   // Defined in Car
+    }
+}
+
+
+📌 Here, Car IS-A Vehicle. This allows code reusability and polymorphism.
+
+2. HAS-A Relationship (Composition & Aggregation)
+
+This means a class contains another class as a field (member variable).
+
+Composition (Strong HAS-A):
+
+One class owns another completely.
+
+If the container object is destroyed → the contained object is also destroyed.
+
+✅ Example:
+
+class Engine {
+    void run() {
+        System.out.println("Engine running...");
+    }
+}
+
+class Car {
+    private Engine engine;   // Composition
+
+    Car() {
+        engine = new Engine();  // Car owns Engine
+    }
+
+    void startCar() {
+        engine.run();  // Car uses Engine
+        System.out.println("Car started!");
+    }
+}
+
+
+📌 Here, Car HAS-A Engine. Without Car, engine object doesn’t exist → Composition.
+
+Aggregation (Weak HAS-A):
+
+A class contains another class, but they are independent.
+
+If container is destroyed → the contained object can still exist.
+
+✅ Example:
+
+class Student {
+    String name;
+    Student(String name) {
+        this.name = name;
+    }
+}
+
+class Department {
+    private String deptName;
+    private List<Student> students;   // Aggregation
+
+    Department(String deptName, List<Student> students) {
+        this.deptName = deptName;
+        this.students = students;  // Dept HAS-A Student
+    }
+}
+
+
+📌 Here, Department HAS-A Student. Even if Department is deleted, students can still exist → Aggregation.
+
+3. Dependency Relationship (Uses-A)
+
+When one class depends on another class temporarily (usually as a method parameter).
+
+Not a strong relationship.
+
+✅ Example:
+
+class Printer {
+    void print(String text) {
+        System.out.println(text);
+    }
+}
+
+class User {
+    void usePrinter(Printer p) {   // Dependency (Uses-A)
+        p.print("Printing user document...");
+    }
+}
+
+🔹 Summary Table (Easy to Remember)
+Relationship	Keyword / Concept	Example	Lifetime Dependency
+IS-A	extends, implements	Car IS-A Vehicle	Parent & Child together
+HAS-A (Composition)	Class as a field	Car HAS-A Engine	Strong, owned by parent
+HAS-A (Aggregation)	Class as a field (independent)	Department HAS-A Student	Weak, independent
+Uses-A (Dependency)	Method parameters	User uses Printer	Temporary
+
+✅ Interview Tip:
+If interviewer asks:
+👉 "What are class relationships in Java?"
+You can say:
+
+Java supports IS-A (inheritance) and HAS-A (composition/aggregation).
+
+Additionally, classes can have dependency relationships (uses-a).
+
+These relationships define how objects interact and how code is reused.
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+10.Can private keyword be used with constructor?
+
+
+❓ Can private keyword be used with a constructor in Java?
+
+👉 Yes, we can declare a constructor as private in Java.
+
+✅ Why do we need a private constructor?
+
+A private constructor restricts object creation from outside the class.
+It is mainly used in the following scenarios:
+
+1️⃣ Singleton Design Pattern
+
+Ensures that only one instance of a class can exist in the JVM.
+
+Constructor is private, so no other class can create a new object.
+
+The instance is created inside the class and returned through a getInstance() method.
+
+📌 Example:
+
+class Singleton {
+    // Step 1: Create a private static instance of the class
+    private static Singleton instance;
+
+    // Step 2: Private constructor (no other class can call it)
+    private Singleton() {
+        System.out.println("Private Constructor Called");
+    }
+
+    // Step 3: Public method to provide global access point
+    public static Singleton getInstance() {
+        if (instance == null) {
+            instance = new Singleton();
+        }
+        return instance;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        // Singleton obj1 = new Singleton(); ❌ Error (constructor is private)
+        Singleton obj1 = Singleton.getInstance();
+        Singleton obj2 = Singleton.getInstance();
+
+        System.out.println(obj1 == obj2); // true (same object)
+    }
+}
+
+
+👉 Here, only one object of Singleton is created.
+
+
+⚠️ Important Points for Interview:
+
+✅ Yes, private constructors are allowed in Java.
+
+✅ They are used to restrict instantiation.
+
+✅ Commonly used in Singleton, Factory Methods, Utility Classes.
+
+❌ If you declare only a private constructor and no public method to create objects → the class cannot be instantiated anywhere.
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
