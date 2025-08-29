@@ -1714,3 +1714,363 @@ User-defined Packages → Created by programmers (like the example above).
 📌 In simple words:
 Declaring a package = package packageName; at the top of your file.
 It groups related classes together, just like putting books into the right bookshelf.
+
+-----------------------------------------------------------------------------------------------------------------
+
+
+13. How to create a class inside a package which is in another package in Java?
+
+👉 In Java, we can create sub-packages (a package inside another package). This is often used to organize large projects better.
+
+For example:
+
+Suppose we have a parent package: com.company
+
+Inside it, we create a sub-package: com.company.hr
+
+Inside hr, we will create a class: Employee.
+
+Step 1: Declare the package
+
+At the top of the class file, we declare the package hierarchy:
+
+package com.company.hr;
+
+public class Employee {
+    private String name;
+    private int id;
+
+    public Employee(String name, int id) {
+        this.name = name;
+        this.id = id;
+    }
+
+    public void display() {
+        System.out.println("Employee ID: " + id + ", Name: " + name);
+    }
+}
+
+
+Here, the class Employee belongs to package com.company.hr, which is a sub-package of com.company.
+
+Step 2: Using the class from another package
+
+Now, let’s say we have a Main class in another package:
+
+package com.company;
+
+import com.company.hr.Employee;  // importing from sub-package
+
+public class Main {
+    public static void main(String[] args) {
+        Employee emp = new Employee("John", 101);
+        emp.display();
+    }
+}
+
+Step 3: Folder Structure
+
+Java enforces the folder structure to match the package structure:
+
+src/
+ └── com/
+      └── company/
+           ├── Main.java
+           └── hr/
+                └── Employee.java
+
+✅ Interview Explanation
+
+Yes, we can create a class inside a package that is inside another package (sub-package).
+
+We just need to declare the full package name at the top using package keyword.
+
+When using it elsewhere, we import it using import package.subpackage.ClassName.
+
+This helps in modularity, code reusability, and better organization of large projects.
+
+⚡ Example analogy:
+Think of package as a folder in your computer. A sub-package is a sub-folder inside it. A class is like a file inside the folder.
+
+--------------------------------------------------------------------------------------------------------------
+
+14.Do you know about input stream
+
+
+What is an InputStream?
+In simple terms, an InputStream is a Java class that represents a flow of incoming data from a source. Think of it as a pipe that brings data into your program. The data is read sequentially, one piece at a time, in the form of raw bytes.
+
+The source of this data can be almost anything:
+
+A file on your disk
+
+A network connection (like a web page being downloaded)
+
+A peripheral device (like a keyboard or microphone)
+
+An array of bytes in memory
+
+Another program's output (through a pipe)
+
+🔹 What is InputStream in Java?
+
+InputStream is an abstract class in Java (from java.io package).
+
+It is the superclass of all classes that represent an input stream of bytes.
+
+Used to read data (input) from sources like:
+
+Files
+
+Keyboard
+
+Network connections
+
+Byte arrays, etc.
+
+The InputStream Hierarchy
+InputStream is an abstract class at the top of a hierarchy. This means you typically use one of its concrete subclasses, each designed for a specific type of input source.
+
+text
+java.lang.Object
+  └── java.io.InputStream (Abstract Class)
+        ├── FileInputStream (for reading files)
+        ├── ByteArrayInputStream (for reading from a byte array)
+        ├── FilterInputStream
+        │     ├── BufferedInputStream (wraps another stream for efficiency)
+        │     └── DataInputStream (for reading primitive data types)
+        ├── ObjectInputStream (for reading serialized objects)
+        └── ... and many others
+
+
+🔹 Key Points
+
+Belongs to package:
+
+import java.io.InputStream;
+
+
+Reads 8-bit bytes (not characters → for characters we use Reader).
+
+Being abstract, it cannot be used directly. Instead, we use its subclasses:
+
+FileInputStream
+
+ByteArrayInputStream
+
+BufferedInputStream
+
+ObjectInputStream
+
+PipedInputStream
+
+It provides methods for reading data.
+
+🔹 Important Methods of InputStream
+int read()  
+
+
+Reads one byte of data.
+
+Returns -1 if the end of the stream is reached.
+
+int read(byte[] b)  
+
+
+Reads bytes into an array b[].
+
+int read(byte[] b, int off, int len)  
+
+
+Reads up to len bytes into the array starting from index off.
+
+void close()  
+
+
+Closes the stream and releases resources.
+
+int available()  
+
+
+Returns the number of bytes that can be read without blocking.
+
+🔹 Example 1: Reading file using FileInputStream
+import java.io.*;
+
+public class InputStreamExample {
+    public static void main(String[] args) {
+        try {
+            // Create FileInputStream object
+            InputStream input = new FileInputStream("example.txt");
+
+            // Read one byte at a time
+            int data;
+            while ((data = input.read()) != -1) {
+                System.out.print((char) data); // convert byte to char
+            }
+
+            input.close(); // close stream
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+✅ Reads content of example.txt byte by byte and prints to console.
+
+🔹 Example 2: Reading with byte array (faster)
+import java.io.*;
+
+public class InputStreamArrayExample {
+    public static void main(String[] args) {
+        try {
+            InputStream input = new FileInputStream("example.txt");
+
+            byte[] buffer = new byte[20]; // read in chunks
+            int bytesRead = input.read(buffer);
+
+            System.out.println("Read " + bytesRead + " bytes.");
+            System.out.println(new String(buffer)); // convert bytes → String
+
+            input.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+✅ Reads data in chunks instead of one byte at a time.
+
+
+🔹 Real-World Uses
+
+Reading data from files.
+
+Reading binary data like images, audio, or video streams.
+
+Reading data from network sockets.
+
+Reading input from a System.in (keyboard input).
+
+
+Important Note: InputStream vs. Reader
+This is a common point of confusion.
+
+InputStream and its subclasses are for reading raw bytes (binary data). Perfect for images, audio, ZIP files, or any data where the exact bytes matter.
+
+Reader and its subclasses (like FileReader) are for reading text (characters). They convert bytes into characters using a character encoding (like UTF-8). Use these for reading text files.
+
+Analogy: An InputStream gives you the raw 1s and 0s. A Reader interprets those 1s and 0s as letters and words according to a dictionary (the encoding).
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+What is an OutputStream?
+An OutputStream is the opposite of an InputStream. It's a Java class that represents a flow of outgoing data from your program to a destination. Think of it as a pipe that sends data out. You write raw bytes sequentially into this pipe, and they are delivered to a target.
+
+The destination of this data can be:
+
+A file on your disk (to create or overwrite it)
+
+A network connection (to send data to a server)
+
+A peripheral device (like a printer)
+
+An array of bytes in memory
+
+Another program's input (through a pipe)
+
+The OutputStream Hierarchy
+Just like InputStream, OutputStream is an abstract class at the top of a hierarchy. You use one of its concrete subclasses for a specific type of output destination.
+
+text
+java.lang.Object
+  └── java.io.OutputStream (Abstract Class)
+        ├── FileOutputStream (for writing to files)
+        ├── ByteArrayOutputStream (for writing to a byte array in memory)
+        ├── FilterOutputStream
+        │     ├── BufferedOutputStream (wraps another stream for efficiency)
+        │     └── DataOutputStream (for writing primitive data types)
+        │     └── PrintStream (for writing formatted text, e.g., System.out)
+        ├── ObjectOutputStream (for writing serialized objects)
+        └── ... and others
+
+
+🔹 Common Methods in OutputStream
+
+Since it’s abstract, subclasses implement the actual writing.
+Key methods are:
+
+void write(int b)
+
+Writes a single byte (lower 8 bits of the int).
+
+Example: output.write(65); // writes 'A'.
+
+void write(byte[] b)
+
+Writes an entire byte array to the output.
+
+void write(byte[] b, int off, int len)
+
+Writes part of a byte array (from index off to off+len).
+
+void flush()
+
+Forces any buffered data to be written immediately.
+
+void close()
+
+Closes the stream and releases resources.
+
+🔹 Real-time Examples of OutputStream
+1. Writing to a File
+import java.io.FileOutputStream;
+import java.io.OutputStream;
+
+public class OutputStreamExample {
+    public static void main(String[] args) {
+        try {
+            OutputStream os = new FileOutputStream("output.txt");
+            
+            String data = "Hello, OutputStream!";
+            os.write(data.getBytes()); // converting string to byte[]
+            
+            os.close();
+            System.out.println("Data written successfully!");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+✅ This writes the text "Hello, OutputStream!" into output.txt.
+
+2. Writing into Byte Array (In-memory)
+import java.io.ByteArrayOutputStream;
+
+public class ByteArrayOutputExample {
+    public static void main(String[] args) {
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            String msg = "Data in Memory!";
+            
+            baos.write(msg.getBytes());
+            
+            // Convert byte array back to string
+            String result = baos.toString();
+            System.out.println("Stored: " + result);
+            
+            baos.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+
+
+✅ Instead of writing to a file, this stores the data in memory (useful for temporary storage).
+
+
+
