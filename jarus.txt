@@ -1555,4 +1555,162 @@ public class Main {
 ❌ If you declare only a private constructor and no public method to create objects → the class cannot be instantiated anywhere.
 
 
-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+11. Can we use a package inside another package?
+
+
+🔹 What is a Package?
+
+A package is a way to group related classes, interfaces, and sub-packages.
+
+It helps in organizing code and avoiding name conflicts.
+
+🔹 Sub-Package
+
+A package inside another package is called a sub-package.
+
+Declared using the . (dot) notation.
+
+Example:
+
+java.util is a sub-package of java
+
+java.sql is also a sub-package of java
+
+🔹 Example: Custom Package with Sub-Package
+// File: mypack/MainClass.java
+package mypack;
+
+public class MainClass {
+    public void display() {
+        System.out.println("Hello from MainClass in mypack package!");
+    }
+}
+
+// File: mypack/subpack/SubClass.java
+package mypack.subpack;   // sub-package inside mypack
+
+public class SubClass {
+    public void show() {
+        System.out.println("Hello from SubClass in mypack.subpack package!");
+    }
+}
+
+// File: Test.java
+import mypack.MainClass;
+import mypack.subpack.SubClass;
+
+public class Test {
+    public static void main(String[] args) {
+        MainClass m = new MainClass();
+        m.display();
+
+        SubClass s = new SubClass();
+        s.show();
+    }
+}
+
+🔹 Output
+Hello from MainClass in mypack package!
+Hello from SubClass in mypack.subpack package!
+
+🔹 Interview Explanation
+
+Yes, we can have a package inside another package (sub-package).
+
+It allows better modularization and layered project structure.
+
+Real-time example:
+
+java.util → has sub-packages like java.util.concurrent, java.util.regex.
+
+In Spring Framework, you’ll see org.springframework.boot, org.springframework.data.jpa, etc. (all sub-packages for modular design).
+
+
+3. Key Points to Remember (Crucial for Interview)
+No Special Access Privileges: A crucial point is that being a subpackage does not grant any special access. The protected and default (package-private) access modifiers are only valid within the exact same package.
+
+A class in com.jarus.drones cannot access a class with default (no modifier) visibility in com.jarus.drones.navigation. They are considered different packages for access control.
+
+Directory Structure Must Match: The physical folder structure on your computer must exactly mirror the package structure.
+
+The class com.jarus.drones.navigation.GPS must be located in the folder com/jarus/drones/navigation/GPS.java.
+
+Imports are Explicit: To use a class from a subpackage, you must import it using its fully qualified name (import com.jarus.drones.navigation.GPS;). You cannot use a wildcard to import all subpackages. import com.jarus.drones.*; will import classes only from the drones package, not from its subpackages like navigation or logistics.
+
+------------------------------------------------------------------------------------------------------------------------------------------
+
+12. How will you declare a Package in Java?
+
+A package in Java is used to group related classes, interfaces, and sub-packages together.
+It helps in:
+
+Avoiding name conflicts
+
+Organizing code properly
+
+Providing access protection
+
+Syntax for Declaring a Package
+package packageName;
+
+
+👉 The package statement must be the first statement in your Java file (before imports and class definitions).
+
+Steps to Declare and Use a Package
+Step 1: Create a Package
+
+Let’s say we want to create a package called myPackage.
+
+// File: MyClass.java
+package myPackage;   // Declaring the package
+
+public class MyClass {
+    public void displayMessage() {
+        System.out.println("Hello from MyClass inside myPackage!");
+    }
+}
+
+
+Now compile it with:
+
+javac -d . MyClass.java
+
+
+-d . tells Java to place compiled classes in the correct package folder (it creates a myPackage directory automatically).
+
+Step 2: Use the Package
+
+Now create another file TestPackage.java in the default folder:
+
+// File: TestPackage.java
+import myPackage.MyClass;   // Import the class from myPackage
+
+public class TestPackage {
+    public static void main(String[] args) {
+        MyClass obj = new MyClass();
+        obj.displayMessage();
+    }
+}
+
+
+Compile and run:
+
+javac TestPackage.java
+java TestPackage
+
+
+✅ Output:
+
+Hello from MyClass inside myPackage!
+
+Types of Packages in Java
+
+Built-in Packages → Already available in Java (e.g., java.util, java.io, java.sql).
+
+User-defined Packages → Created by programmers (like the example above).
+
+📌 In simple words:
+Declaring a package = package packageName; at the top of your file.
+It groups related classes together, just like putting books into the right bookshelf.
