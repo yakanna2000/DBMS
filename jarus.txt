@@ -2071,6 +2071,636 @@ public class ByteArrayOutputExample {
 
 
 ✅ Instead of writing to a file, this stores the data in memory (useful for temporary storage).
+------------------------------------------------------------------------------------------------------------------------
+
+16.What type of conventions do you follow while naming the identifiers
+
+
+Of course. Following naming conventions is crucial for writing clean, maintainable, and professional Java code. It's not just about making the code work; it's about making it readable for other developers (and for your future self).
+
+Here are the standard Java naming conventions I follow for identifiers, broken down by type.
+
+The Golden Rule: CamelCase
+Java primarily uses camelCase naming, where the first word is lowercase and each subsequent word starts with an uppercase letter. There are two variations:
+
+lowerCamelCase: myVariableName, calculateTotalDistance()
+
+UpperCamelCase (PascalCase): String, DroneController, GlobalConfig
+
+Conventions by Identifier Type
+1. Classes and Interfaces
+Convention: UpperCamelCase (PascalCase)
+
+Rule: Use nouns (or adjective-noun combinations) that describe the object. Should be concise and meaningful.
+
+Examples:
+
+class Drone { ... }
+
+class AutonomousNavigationSystem { ... }
+
+interface FlightController { ... }
+
+class String (from Java itself)
+
+class HashMap
+
+2. Methods
+Convention: lowerCamelCase
+
+Rule: Use verbs or verb phrases that describe the action performed by the method.
+
+Examples:
+
+drone.takeOff()
+
+drone.calculateBatteryLife()
+
+sensor.getCurrentReading()
+
+isActive() (methods that return a boolean often start with 'is', 'has', 'can', etc.)
+
+setCoordinates(double lat, double lon) (setter method)
+
+3. Variables (Local, Instance, and Static Variables)
+Convention: lowerCamelCase
+
+Rule: Use short, meaningful nouns or abbreviations. The name should describe the data the variable holds.
+
+Examples:
+
+int droneId;
+
+double maximumAltitude;
+
+boolean isConnected;
+
+String destinationCoordinates;
+
+List<Sensor> sensorList;
+
+4. Constants (Static Final Variables)
+Convention: UPPERCASE_SNAKE_CASE
+
+Rule: Use all uppercase letters with words separated by underscores. The name should be fully descriptive.
+
+Examples:
+
+public static final double MAX_SPEED_KNOTS = 120.5;
+
+public static final String COMPANY_NAME = "JARUS";
+
+private static final int TIMEOUT_DURATION_MS = 5000;
+
+5. Packages
+Convention: all.lowercase.separated.dots
+
+Rule: Use the reverse of your organization's domain name to ensure uniqueness. Use only lowercase letters.
+
+Examples:
+
+com.jarus.drones.navigation
+
+org.apache.commons.math
+
+java.util (from Java itself)
+
+6. Type Parameters (Generics)
+Convention: Single, uppercase letter
+
+Rule: Common conventions are:
+
+E - Element (used extensively by the Java Collections Framework)
+
+K - Key
+
+V - Value
+
+T - Type
+
+N - Number
+
+S, U, V etc. - 2nd, 3rd, 4th types
+
+Examples:
+
+public class Drone<T extends Payload> { ... }
+
+public interface Map<K, V> { ... }
+
+public List<E> getSensorReadings() { ... }
+
+Summary Table for Quick Reference
+Identifier Type	Naming Convention	Example
+Class / Interface	UpperCamelCase	Drone, AutopilotSystem
+Method	lowerCamelCase	calculateRoute(), isAirborne()
+Variable	lowerCamelCase	batteryLevel, gpsCoordinates
+Constant	UPPER_SNAKE_CASE	MAX_ALTITUDE, LOG_FILE_PATH
+Package	all.lowercase	com.jarus.drones.flightcontrol
+Generic Type	Single Uppercase Letter	T, K, V, E
+Why These Conventions Matter (The "Why")
+Readability: Code is read far more often than it is written. calculateFlightPath() is instantly understandable; cFP() is not.
+
+Maintainability: Consistent naming makes it easier for you and other developers to navigate, understand, and modify code, especially in large projects.
+
+Reduced Errors: Following conventions helps avoid simple mistakes. For example, you know System is a class and out is a static variable just by looking at their case.
+
+Professionalism: It shows that you care about your craft and makes your code look like it was written by a seasoned professional, which is exactly what an interviewer wants to see.
+
+Real-World Analogy: A Well-Organized Workshop
+Think of your codebase like a workshop.
+
+Classes are like big tools (Table Saw, Drill Press). You label them with clear, descriptive names.
+
+Methods are the actions those tools perform (Saw.cut(), DrillPress.boreHole()).
+
+Variables are like materials and parts (oakBoard, halfInchScrew, bluePaint). You label bins clearly so you know what's inside.
+
+Constants are the unchangeable rules of the workshop (MAX_VOLTAGE=240, SAFETY_GOGGLES_REQUIRED=true). These are posted prominently on the wall in all caps.
+
+----------------------------------------------------------------------------------------------------------------------------------------
+
+17.JDBC steps and implementation?
+
+
+Of course. JDBC (Java Database Connectivity) is a fundamental API for connecting Java applications to databases. Understanding the steps is a classic interview topic.
+
+Here are the standard JDBC steps, explained clearly with a full implementation example.
+
+The 7 Standard Steps of JDBC
+Import the Packages
+
+Load and Register the Driver
+
+Establish the Connection
+
+Create a Statement
+
+Execute the Query
+
+Process the Result
+
+Close the Connection
+
+Step-by-Step Implementation
+
+Let's walk through each step with code to connect to a database, query a hypothetical drones table, and print the results.
+
+Step 1: Import the Packages
+You need to import the JDBC classes from the java.sql package.
+
+java
+// Typically at the top of your Java file
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+Step 2: Load and Register the Driver (Optional in modern JDBC)
+This step tells the JVM which database driver (e.g., for MySQL, PostgreSQL, Oracle) to use. In older JDBC versions, you had to explicitly load the class. Since JDBC 4.0 (Java 6), this is usually automatic due to a service provider mechanism, but it's good to know.
+
+Old Way (Explicitly loading the class):
+
+java
+Class.forName("com.mysql.cj.jdbc.Driver"); // Throws ClassNotFoundException
+Modern Way (Auto-loaded): You often don't need this line. The driver JAR file is automatically discovered on the classpath.
+
+Step 3: Establish the Connection
+This is where you actually connect to your database using DriverManager.getConnection(). You need the database URL, username, and password.
+
+Database URL Format:
+jdbc:<subprotocol>:<subname>
+
+MySQL: jdbc:mysql://localhost:3306/jarus_db
+
+PostgreSQL: jdbc:postgresql://localhost:5432/jarus_db
+
+java
+// Define connection parameters
+String jdbcUrl = "jdbc:mysql://localhost:3306/jarus_db";
+String username = "your_username";
+String password = "your_password";
+
+// Establish the connection
+Connection connection = DriverManager.getConnection(jdbcUrl, username, password);
+Step 4: Create a Statement
+A Statement object is used to send your SQL queries to the database.
+
+java
+Statement statement = connection.createStatement();
+Step 5: Execute the Query
+Use the Statement object to execute the SQL query.
+
+For SELECT queries (which return data), use executeQuery().
+
+For INSERT, UPDATE, DELETE (which modify data), use executeUpdate().
+
+java
+String sqlQuery = "SELECT id, name, status FROM drones WHERE status = 'ACTIVE'";
+ResultSet resultSet = statement.executeQuery(sqlQuery); // Use for SELECT
+Step 6: Process the Result
+The ResultSet object contains the data returned from the query. It behaves like an iterator. You use a while loop to go through each row and methods like getString(), getInt() to get the data from each column.
+
+java
+// resultSet.next() moves the cursor to the next row and returns false if no more rows
+while (resultSet.next()) {
+    int id = resultSet.getInt("id");        // Get data by column name
+    String name = resultSet.getString("name");
+    String status = resultSet.getString("status");
+
+    // Alternatively, you can get data by column index (starting from 1)
+    // int id = resultSet.getInt(1);
+    // String name = resultSet.getString(2);
+
+    System.out.println("Drone ID: " + id + ", Name: " + name + ", Status: " + status);
+}
+Step 7: Close the Connection (Use Try-With-Resources!)
+This is the most important step. Database connections are expensive resources. You must close them to avoid leaks. The modern and safest way is to use try-with-resources, which automatically closes the resources for you, even if an exception occurs.
+
+Full Implementation Example (The Right Way)
+Here’s the complete code putting all the steps together using try-with-resources:
+
+java
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+public class JdbcExample {
+
+    public static void main(String[] args) {
+        // Database credentials
+        String jdbcUrl = "jdbc:mysql://localhost:3306/jarus_db";
+        String username = "your_username";
+        String password = "your_password";
+
+        // Step 1, 2, 3, 4, 5, 6, 7 are all handled inside the try-with-resources block
+        // The Connection, Statement, and ResultSet will be closed automatically
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, username, password);
+             Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery("SELECT id, name, status FROM drones")) {
+
+            System.out.println("Connected to the database successfully!");
+
+            // Process the result set
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String name = resultSet.getString("name");
+                String status = resultSet.getString("status");
+
+                System.out.printf("ID: %d, Name: %s, Status: %s%n", id, name, status);
+            }
+
+        } catch (SQLException e) {
+            // Handle any SQL errors
+            System.err.println("Database error occurred: " + e.getMessage());
+            e.printStackTrace();
+        }
+        // The connection is automatically closed here, even if an exception was thrown.
+    }
+}
+Important Upgrade: Using PreparedStatement
+The Statement object is simple but vulnerable to SQL Injection attacks. For any query that involves user input, you should always use PreparedStatement.
+
+Example of PreparedStatement (Highly Recommended):
+
+java
+String sql = "SELECT * FROM drones WHERE name = ? AND status = ?"; // '?' are placeholders
+
+try (Connection conn = DriverManager.getConnection(jdbcUrl, username, password);
+     PreparedStatement pStatement = conn.prepareStatement(sql)) { // Create PreparedStatement
+
+    // Set the values for the placeholders (index starts at 1)
+    pStatement.setString(1, "Explorer-1"); // Set 1st placeholder to "Explorer-1"
+    pStatement.setString(2, "ACTIVE");     // Set 2nd placeholder to "ACTIVE"
+
+    try (ResultSet rs = pStatement.executeQuery()) { // Execute the query
+        while (rs.next()) {
+            // Process results...
+        }
+    }
+} catch (SQLException e) {
+    e.printStackTrace();
+}
+Summary for Your Interview
+You can say: "The standard JDBC steps involve loading the driver, establishing a connection, creating a statement, executing the query, processing the result set, and finally closing all resources. The modern best practice is to use try-with-resources to ensure connections are always closed and to use PreparedStatement instead of a regular Statement to prevent SQL injection attacks and for better performance with parameterized queries."
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+18.How will you find an error in your code and how will you fix it?
+
+
+🔹 Q: How will you find an error in your code and how will you fix it?
+1️⃣ Types of Errors in Java (with Examples & Fixes)
+✅ 1. Compilation Errors
+
+These errors occur before the program runs, when the Java compiler checks syntax and semantics.
+
+Examples:
+
+Missing semicolon
+
+Using the wrong data type
+
+Misspelled variable names
+
+Example:
+
+public class CompileErrorExample {
+    public static void main(String[] args) {
+        int a = 5
+        System.out.println(a);
+    }
+}
+
+
+Error Message:
+
+CompileErrorExample.java:3: error: ';' expected
+        int a = 5
+                ^
+
+
+Fix: Add the missing semicolon.
+
+int a = 5;
+
+✅ 2. Runtime Errors
+
+Errors that occur while the program is running.
+
+Caused by invalid inputs, null references, or array index issues.
+
+Common ones: NullPointerException, ArrayIndexOutOfBoundsException, ArithmeticException.
+
+Example (NullPointerException):
+
+public class RuntimeErrorExample {
+    public static void main(String[] args) {
+        String str = null;
+        System.out.println(str.length()); // runtime error
+    }
+}
+
+
+Error Message:
+
+Exception in thread "main" java.lang.NullPointerException
+    at RuntimeErrorExample.main(RuntimeErrorExample.java:4)
+
+
+Fix: Add null check.
+
+if (str != null) {
+    System.out.println(str.length());
+} else {
+    System.out.println("String is null!");
+}
+
+✅ 3. Logical Errors
+
+The program runs successfully but produces wrong results because the logic is incorrect.
+
+Hardest to detect since no error message is shown.
+
+Example:
+
+public class LogicalErrorExample {
+    public static void main(String[] args) {
+        int sum = 0;
+        for (int i = 1; i <= 5; i++) { // logic mistake
+            sum += i;
+        }
+        System.out.println("Sum = " + sum); // Expected 10, got 15
+    }
+}
+
+
+Fix: Correct the loop logic.
+
+for (int i = 1; i < 5; i++) {  // corrected condition
+    sum += i;
+}
+
+🔍 Steps to Find and Fix Errors in Java
+
+Errors in Java come in two types:
+
+Compile-time errors → found by compiler (syntax mistakes).
+
+Runtime errors → found when the program runs (logic/exception issues).
+
+Now let’s see how to detect and fix them.
+
+1️⃣ Read Error Message (Compiler / Runtime)
+
+Java gives clear error messages with line numbers and error type.
+
+First thing: Read the error message properly.
+
+Example (Compile-time error):
+public class Main {
+    public static void main(String[] args) {
+        int x = "Hello";  // ❌ Type mismatch
+    }
+}
+
+
+Error shown:
+
+Main.java:3: error: incompatible types: String cannot be converted to int
+        int x = "Hello";
+                ^
+
+
+👉 Fix: Correct data type.
+
+int x = 10; // ✅ fixed
+
+Example (Runtime error):
+public class Main {
+    public static void main(String[] args) {
+        int[] arr = {1, 2, 3, 4, 5};
+        System.out.println(arr[5]); // ❌ index out of range
+    }
+}
+
+
+Error shown:
+
+Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 5
+    at Main.main(Main.java:4)
+
+
+👉 Fix: Access correct index.
+
+System.out.println(arr[4]); // ✅ fixed
+
+2️⃣ Use Debugging Tools
+
+Instead of only reading messages, you can debug step by step using an IDE like IntelliJ, Eclipse, VS Code.
+
+Set breakpoints → pause program at a specific line.
+
+Run in debug mode → program stops at breakpoints.
+
+Step into / step over → move line by line.
+
+Inspect variables → check values at runtime.
+
+Example:
+int sum = 0;
+for(int i=0; i<=5; i++) {  // maybe bug here
+    sum += i;
+}
+System.out.println("Sum = " + sum);
+
+
+If you expected sum = 10 but got 15,
+👉 Debugger will show that loop runs 6 times (0 to 5).
+👉 Fix: change condition to < 5.
+
+for(int i=0; i<5; i++) { // ✅ fixed
+    sum += i;
+}
+
+3️⃣ Use Print Statements (for Logical Errors)
+
+Sometimes, no compiler/runtime error but output is wrong → logic error.
+
+You can trace values using System.out.println().
+
+Example:
+int fact = 1;
+for(int i=1; i<=5; i++) {
+    fact = fact + i;  // ❌ wrong logic, should multiply
+}
+System.out.println("Factorial = " + fact);
+
+
+Output:
+
+Factorial = 16  (wrong)
+
+
+👉 Debug using print:
+
+for(int i=1; i<=5; i++) {
+    fact = fact + i;
+    System.out.println("i=" + i + " fact=" + fact);
+}
+
+
+This shows values growing wrongly.
+👉 Fix:
+
+fact = fact * i; // ✅ multiplication
+
+4️⃣ Unit Testing (JUnit Framework)
+
+For bigger projects, write unit tests for each function.
+
+This helps catch errors automatically.
+
+Example:
+public class Calculator {
+    public static int add(int a, int b) {
+        return a + b;
+    }
+}
+
+
+JUnit Test:
+
+import static org.junit.Assert.*;
+import org.junit.Test;
+
+public class CalculatorTest {
+    @Test
+    public void testAddition() {
+        assertEquals(10, Calculator.add(5, 5));  // ✅ passes
+    }
+
+    @Test
+    public void testAdditionFail() {
+        assertEquals(12, Calculator.add(5, 5));  // ❌ fails
+    }
+}
+
+
+👉 When test fails → we know where the bug is.
+
+✅ Summary
+
+To find and fix errors in Java:
+
+Read error messages carefully → they give line + type of error.
+
+Use debugger tools (breakpoints, step execution, inspect variables).
+
+Add print statements to trace values when logic seems wrong.
+
+Use Unit Testing (JUnit) → automatically detect bugs in methods.
 
 
 
+3️⃣ Steps to Fix an Error
+
+Compilation Errors → Fix syntax, missing symbols, or data type mismatches.
+
+Runtime Errors → Add exception handling (try-catch), null checks, bounds checks.
+
+Logical Errors → Review algorithm, debug step by step, compare expected vs actual output.
+
+4️⃣ More Real-Time Examples
+🔹 Example 1: Array Index Error
+public class ArrayExample {
+    public static void main(String[] args) {
+        int arr[] = {1, 2, 3, 4, 5};
+        System.out.println(arr[5]); // index out of bounds
+    }
+}
+
+
+Error:
+
+Exception in thread "main" java.lang.ArrayIndexOutOfBoundsException: Index 5 out of bounds for length 5
+
+
+Fix:
+
+for (int i = 0; i < arr.length; i++) {
+    System.out.println(arr[i]);
+}
+
+
+🔹 Example 2: Divide by Zero
+public class DivideExample {
+    public static void main(String[] args) {
+        int a = 10, b = 0;
+        System.out.println(a / b); // ArithmeticException
+    }
+}
+
+
+Error:
+
+Exception in thread "main" java.lang.ArithmeticException: / by zero
+
+
+Fix:
+
+if (b != 0) {
+    System.out.println(a / b);
+} else {
+    System.out.println("Cannot divide by zero");
+}
+
+✅ Interview-Style Final Answer:
+
+*"In Java, errors are of three main types: compilation errors, runtime errors, and logical errors.
+To find errors, I first look at the compiler or runtime error messages which show the type and line number. For logical errors, I use debugging tools like breakpoints in my IDE or print statements to trace variable values. I also write unit tests to validate my code.
+To fix errors, I correct syntax for compilation issues, add proper checks or exception handling for runtime errors, and carefully recheck logic for logical errors.
+
+For example, if I face a NullPointerException, I fix it by checking whether the object is null before using it. If an ArrayIndexOutOfBoundsException occurs, I adjust the loop to match the array length. This systematic approach ensures my code runs without errors and produces the expected output."*
