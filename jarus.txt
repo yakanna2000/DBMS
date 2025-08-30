@@ -2704,3 +2704,699 @@ To find errors, I first look at the compiler or runtime error messages which sho
 To fix errors, I correct syntax for compilation issues, add proper checks or exception handling for runtime errors, and carefully recheck logic for logical errors.
 
 For example, if I face a NullPointerException, I fix it by checking whether the object is null before using it. If an ArrayIndexOutOfBoundsException occurs, I adjust the loop to match the array length. This systematic approach ensures my code runs without errors and produces the expected output."*
+
+--------------------------------------------------------------------------------------------------------------------------------------------
+ 19.Tell me about Debugger ? Have you ever used it?
+
+What is a Debugger?
+A debugger is a software tool used to interactively test and debug other programs. It allows you to pause a running program, inspect its internal state (like variable values), and execute it step-by-step to understand its flow and find the exact point where it goes wrong.
+
+Think of it like a video player for your code:
+
+Running a program normally is like hitting "Play" and watching the whole movie.
+
+Using a debugger is like having a remote control that lets you Pause, Rewind, and Play frame-by-frame to see exactly what each actor (variable) is doing at any moment.
+
+Core Features of a Debugger (The "Remote Control" Buttons)
+Any modern debugger, like those built into IntelliJ IDEA, Eclipse, or VS Code, has these key features:
+
+Breakpoints: The most important feature. You can click on the left gutter of your code editor to set a breakpoint (usually a red dot). When the program runs in debug mode, it will pause execution automatically when it hits this line. This allows you to "freeze time" and inspect everything.
+
+Step Through Code: Once paused, you can execute the code line-by-line.
+
+Step Over (F8 in IntelliJ): Executes the current line of code. If the line contains a method call, it executes the entire method and pauses at the next line in the current method. (You ask, "What does this line do?")
+
+Step Into (F7 in IntelliJ): If the current line is a method call, this command "steps into" that method so you can debug its internal code line-by-line. (You ask, "How does this method work?")
+
+Step Out (Shift+F8): Finishes executing the current method and returns to the line where it was called.
+
+Inspecting Variables: While the program is paused, the debugger shows you the current value of every variable in scope. You can hover your mouse over variables or look at a dedicated "Variables" window. This is invaluable for checking if variables contain the values you expect.
+
+The Call Stack: This window shows you the chain of method calls that led to the current point of execution. It answers the question, "How did I get here?"
+
+
+🔹 How I (or you) would use Debugger in Real Time
+
+I usually use IntelliJ IDEA or Eclipse.
+
+If my code misbehaves (wrong output, infinite loop, null pointer), I set breakpoints near suspicious code.
+
+Then, I run the program in Debug Mode.
+
+I step through line by line, watching how variables change.
+
+This helps me identify whether the issue is in logic, data, or method calls.
+
+🔹 Interview-Friendly Answer
+
+🗣️ “A debugger is a tool that lets me pause execution at specific points and check the values of variables, method calls, and program flow. I have used it in IntelliJ and Eclipse while debugging logical errors, null pointer exceptions, and array index issues. Instead of relying only on print statements, I use breakpoints and step execution to find where the program goes wrong. This has saved me a lot of time while fixing bugs.”
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+20. How do you test your code?
+
+Testing is the process of verifying that the code works as expected and produces the correct output under different conditions. In Java (and in software development generally), I follow different levels of testing:
+
+🔹 1. Manual Testing
+
+Run the program with different inputs and check the output manually.
+
+Example: If I wrote a calculator program, I test with:
+
+Normal input (e.g., 2 + 3 → 5)
+
+Edge input (e.g., 0 + 0 → 0, Integer.MAX_VALUE + 1)
+
+Invalid input (e.g., "abc + 5" → Error handled)
+
+👉 Useful for quick verification, but not enough for large projects.
+
+🔹 2. Debugging with Print Statements
+
+Insert System.out.println() at key points to check variable values and flow.
+
+int sum = a + b;
+System.out.println("Sum is: " + sum);
+
+
+👉 This helps in catching logical errors.
+
+🔹 3. Using Debugger (IDE Tools like Eclipse, IntelliJ, VS Code)
+
+Set breakpoints in the code.
+
+Run the program in debug mode.
+
+Step through the program line by line.
+
+Inspect variable values and memory state.
+
+👉 Example: If a loop runs incorrectly, I check how the index changes at each step.
+
+🔹 4. Unit Testing (JUnit Framework in Java)
+
+Write test cases for each method/class.
+
+Example using JUnit:
+
+import static org.junit.Assert.*;
+import org.junit.Test;
+
+public class CalculatorTest {
+    @Test
+    public void testAddition() {
+        assertEquals(10, Calculator.add(5, 5));
+    }
+
+    @Test
+    public void testDivision() {
+        assertEquals(2, Calculator.divide(10, 5));
+    }
+
+    @Test(expected = ArithmeticException.class)
+    public void testDivisionByZero() {
+        Calculator.divide(10, 0);
+    }
+}
+
+
+👉 Benefits:
+
+Automated testing
+
+Easy to re-run when code changes
+
+Detects errors early
+
+🔹 5. Integration Testing
+
+Check whether multiple classes/modules work together correctly.
+
+Example: In JDBC, after inserting data into DB → fetch it back → check if it matches.
+
+🔹 6. Exception & Edge Case Testing
+
+Test how program handles unexpected inputs:
+
+Null values
+
+Empty strings
+
+Out-of-bound indexes
+
+Database connection failure
+
+Example:
+
+try {
+    int arr[] = {1, 2, 3};
+    System.out.println(arr[5]); // will throw exception
+} catch (ArrayIndexOutOfBoundsException e) {
+    System.out.println("Handled safely!");
+}
+
+🔹 7. Performance Testing (Optional in Projects)
+
+Check if the program works efficiently for large input.
+
+Example: Sorting 1,000,000 numbers – does it run within reasonable time?
+
+✅ Final Interview-Style Answer
+
+I test my code in multiple ways. First, I run it manually with different inputs to quickly validate correctness. If something goes wrong, I use print statements or a debugger in my IDE to trace the issue. For proper validation, I write JUnit unit tests so that I can repeatedly test my methods automatically. I also check for edge cases and exceptions, ensuring the program doesn’t break under invalid inputs. In bigger projects, I also perform integration tests to confirm modules work together properly.
+
+--------------------------------------------------------------------------------------------------------------------------------------------------
+
+ 21.If you create your own data structure what functions will you include in them?
+
+
+✅ If I create my own Data Structure, the functions I’ll include depend on what type of data structure I’m building. Let’s consider a few cases:
+🔹 1. Custom Array (like Dynamic Array)
+
+Functions to include:
+
+add(element) → insert at the end
+
+insert(index, element) → insert at a specific position
+
+get(index) → fetch value at index
+
+set(index, element) → update value at index
+
+remove(index) → remove element at index
+
+size() → return current number of elements
+
+isEmpty() → check if array is empty
+
+clear() → remove all elements
+
+💡 Example:
+
+class MyArray {
+    private int[] data;
+    private int size;
+
+    public MyArray(int capacity) {
+        data = new int[capacity];
+        size = 0;
+    }
+
+    public void add(int value) {
+        data[size++] = value;
+    }
+
+    public int get(int index) {
+        return data[index];
+    }
+
+    public int size() {
+        return size;
+    }
+}
+
+🔹 2. Custom Stack
+
+Functions to include:
+
+push(element) → add element to the top
+
+pop() → remove and return top element
+
+peek() → return top element without removing
+
+isEmpty() → check if stack is empty
+
+size() → return number of elements
+
+💡 Example use case: Browser back button, undo functionality.
+
+🔹 3. Custom Queue
+
+Functions to include:
+
+enqueue(element) → add element at rear
+
+dequeue() → remove element from front
+
+peek() → see the front element
+
+isEmpty() → check if empty
+
+size() → get number of elements
+
+💡 Example use case: Printer jobs, order processing.
+
+🔹 4. Custom Linked List
+
+Functions to include:
+
+addFirst(element) → add at beginning
+
+addLast(element) → add at end
+
+removeFirst() → remove from beginning
+
+removeLast() → remove from end
+
+get(index) → get element at index
+
+size() → get length
+
+isEmpty() → check if list is empty
+
+🔹 5. Custom HashMap
+
+Functions to include:
+
+put(key, value) → insert/update a key-value pair
+
+get(key) → retrieve value by key
+
+remove(key) → delete entry
+
+containsKey(key) → check if key exists
+
+size() → number of key-value pairs
+
+isEmpty()
+
+🎯 Interview Answer (Summary)
+
+"If I were to create my own data structure, I would include the basic operations like insertion, deletion, search, update, and traversal. For example, if it’s a Stack, I would implement push, pop, and peek. If it’s a Queue, I’d include enqueue and dequeue. And for a custom Array or List, I’d add functions like add, get, remove, and size. Essentially, the functions depend on the data structure, but they should support efficient access, modification, and error handling."
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+22.Difference between data structure and data types?
+
+
+🔹 1. Definition
+
+Data Type
+
+A data type is a classification that specifies what kind of data a variable can hold.
+
+It defines the nature of the data → whether it’s a number, character, decimal, boolean, or object.
+
+Example:
+
+int → integers like 1, 25, -99
+
+double → decimal values like 3.14, 100.50
+
+char → single character like 'A', 'z'
+
+boolean → true/false
+
+String → sequence of characters
+
+Data Structure
+
+A data structure is a method or model to store, organize, and manipulate data efficiently.
+
+It defines the organization of data and provides operations like insertion, deletion, traversal, searching, and sorting.
+
+Example:
+
+Array
+
+Stack
+
+Queue
+
+Linked List
+
+Tree, Graph
+
+👉 Key difference: Data type tells you what kind of data, data structure tells you how that data is stored and accessed.
+
+🔹 2. Level
+
+Data Type → Low-level, primitive building blocks.
+
+Data Structure → Higher-level, built using data types.
+
+For example:
+
+int rollNo = 101; // Data type - primitive
+int[] rollNos = {101, 102, 103}; // Data structure (Array) built on int
+
+🔹 3. Purpose
+
+Data Type → Represents a single unit of data.
+
+Data Structure → Represents a collection of data items and defines how they are related and manipulated.
+
+Example:
+
+int age = 21; → just a single piece of information.
+
+List<Integer> ages = Arrays.asList(21, 22, 23); → multiple ages stored and can be looped, sorted, etc.
+
+🔹 4. Operations
+
+Data Type → Direct arithmetic and logical operations.
+
++, -, *, /, %, <, > etc.
+
+Data Structure → Specialized operations like:
+
+Array → index-based access, traversal
+
+Stack → push, pop, peek
+
+Queue → enqueue, dequeue
+
+Linked List → insert, delete, traverse
+
+Tree → insert node, delete node, preorder/postorder traversal
+
+Graph → BFS, DFS, shortest path
+
+🔹 5. Example in Java
+// Data Types
+int age = 25;             // integer type
+double salary = 55000.5;  // floating point type
+char grade = 'A';         // character type
+boolean isPassed = true;  // boolean type
+
+// Data Structure
+int[] marks = {90, 85, 75, 95}; // Array
+Stack<Integer> stack = new Stack<>(); // Stack
+stack.push(10);
+stack.push(20);
+System.out.println(stack.pop()); // Output: 20
+
+🔹 6. Real-Life Analogy
+
+Data Type → Like a single item type in a shop (pen, notebook, eraser).
+
+Data Structure → Like a storage shelf/box where multiple items are arranged systematically for quick access.
+
+Example:
+
+int → a single pen.
+
+Array of int → a box containing 100 pens arranged in order.
+
+Stack → pile of books one on top of another (LIFO).
+
+Queue → people standing in a ticket line (FIFO).
+
+
+------------------------------------------------------------------------------------------------------------------------------
+
+
+23.Explain how java works like jdk, jvm and jre?
+
+
+Of course. This is a fundamental and very common interview question. Understanding the roles of JDK, JRE, and JVM is crucial to understanding how Java itself works.
+
+Let's break it down in a clear, structured way.
+
+The High-Level Analogy: Building and Running a Car
+Think of creating and running a Java program like building and driving a car:
+
+JDK (Java Development Kit): This is the entire car factory. It contains all the tools you need to build a car from scratch: the welding machines, the assembly robots, the paint shop, and even the designs and rules for what a car should be.
+
+JRE (Java Runtime Environment): This is the garage and the road-worthy parts of a car. You don't need the entire factory to drive a car. You just need a place to keep it (the garage) and the key components that make it run (the engine, wheels, etc.). Similarly, the JRE is what you need to run a Java program, but not to create one.
+
+JVM (Java Virtual Machine): This is the car's engine. It's the core component that actually makes the program "go". It takes the fuel (the compiled Java code) and runs it. The magic of Java "write once, run anywhere" happens because this "engine" can be installed on any platform (Windows, Mac, Linux, etc.), so the same fuel can run on any car that has this engine.
+
+Detailed Explanation of Each Component
+1. JVM (Java Virtual Machine) - The "Engine"
+What it is: The JVM is an abstract computing machine. It's a specification that describes how a program should be executed. It's the core of Java's "Write Once, Run Anywhere" (WORA) capability.
+
+What it does:
+
+Loads Code: The JVM reads the compiled Java code (bytecode).
+
+Verifies Code: It checks the code for security and integrity issues.
+
+Executes Code: It interprets (or uses a Just-In-Time compiler to compile) the bytecode into native machine code (0101) for the specific operating system it's running on.
+
+Provides Runtime Environment: It manages memory (through garbage collection) and provides the environment where the Java program runs.
+
+Key Point: The JVM is platform-dependent. You need a different JVM for Windows, Linux, and macOS. But the bytecode it executes is the same everywhere.
+
+2. JRE (Java Runtime Environment) - The "Garage & Running Gear"
+What it is: The JRE is a software package that contains everything needed to run a Java application. It is the implementation of the JVM.
+
+What it contains:
+
+JVM: The engine to run the code.
+
+Libraries (Java Class Libraries): A collection of pre-written code (like java.lang, java.util, java.math) that Java programs need to function. These are the ready-made parts your car uses, like the headlights and steering wheel.
+
+Other Files: Support files like property files and resources.
+
+Who needs it? End-users who only want to run Java applications (like a Minecraft player or someone using a Java-based desktop app). They do not need the development tools.
+
+Key Point: If you only want to run Java programs, you install the JRE.
+
+3. JDK (Java Development Kit) - The "Complete Factory"
+What it is: The JDK is a software development kit that contains everything needed to develop Java applications.
+
+What it contains:
+
+JRE: So you can run the code you write.
+
+Development Tools: The most important ones are:
+
+javac (Java Compiler): Translates your human-readable .java source code into JVM-readable .class bytecode.
+
+java (Java Launcher): Starts the JVM and executes the bytecode.
+
+jar: Packages compiled classes into a JAR file (a Zip file for Java code).
+
+javadoc: Generates documentation from your code comments.
+
+Debuggers, etc.
+
+Who needs it? Java Developers. If you want to write, compile, and package Java code, you need the JDK.
+
+How They Work Together: The Java Workflow
+The following diagram visualizes the relationship and the process of writing, compiling, and running a Java program:
+
+Diagram
+Code
+flowchart TD
+    A[Programmer writes<br>.java source code] --> B[JDK's javac compiler<br>compiles code to bytecode]
+    B --> C[Bytecode stored in<br>.class files]
+
+    subgraph D [JRE provides runtime environment]
+        E[JVM loads & verifies bytecode]
+        E --> F[JVM interprets/JIT-compiles<br>bytecode to machine code]
+        F --> G[JVM executes program<br>on specific OS hardware]
+    end
+
+    C --> E
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+What is an Exception?
+An exception is an unwanted or unexpected event that occurs during the execution of a program (at runtime). These events are essentially objects that are "thrown" by the Java runtime system when an error occurs.
+
+Real-world analogy: Imagine you're driving a car (your program is running).
+
+Normal flow: You press the accelerator, the car moves.
+
+Exception: The car runs out of fuel, a tire blows out, or the engine overheats. This is an unexpected event that disrupts your journey.
+
+Exception handling: What you do when that happens—pulling over safely, calling a tow truck, etc. It's the plan for dealing with the problem.
+
+The Hierarchy of Exceptions
+Understanding this hierarchy is key to understanding how to handle them.
+
+text
+Throwable (The root class)
+│
+├── Error (Serious, usually unrecoverable problems)
+│    ├── OutOfMemoryError
+│    └── StackOverflowError
+│
+└── Exception (The parent of all "handlable" problems)
+     │
+     ├── RuntimeException (Unchecked Exceptions)
+     │    ├── NullPointerException
+     │    ├── ArrayIndexOutOfBoundsException
+     │    ├── ArithmeticException (e.g., division by zero)
+     │    └── IllegalArgumentException
+     │
+     └── All other subclasses (Checked Exceptions)
+          ├── IOException
+          ├── FileNotFoundException
+          ├── SQLException
+          └── ClassNotFoundException
+1. Checked Exceptions
+What they are: Exceptions that are checked by the compiler at compile-time.
+
+Rule: You MUST handle them. If your code might throw a checked exception, the compiler will force you to either:
+
+catch it, or
+
+declare that your method throws it.
+
+Examples: IOException, SQLException. These often involve external resources that might fail (files, networks, databases).
+
+2. Unchecked Exceptions (RuntimeException and its subclasses)
+What they are: Exceptions that are not checked by the compiler at compile-time.
+
+Rule: Handling them is optional. The compiler won't force you.
+
+Why: They typically represent programming bugs, like logic errors or improper use of an API (e.g., accessing a null reference, using an invalid array index).
+
+Examples: NullPointerException, ArrayIndexOutOfBoundsException.
+
+3. Errors
+What they are: Serious problems that are not meant to be caught by the application.
+
+Why: They are external to the application and often related to the JVM itself (e.g., running out of memory).
+
+Examples: OutOfMemoryError, StackOverflowError.
+
+How to Handle Exceptions: The "Try-Catch" Block
+This is the primary mechanism for handling exceptions. You put the risky code in a try block and the handling code in a catch block.
+
+Syntax:
+
+java
+try {
+    // Risky code that might throw an exception
+    // e.g., reading a file, dividing numbers, accessing an array
+} catch (ExceptionType name) {
+    // Code to handle the exception
+    // This block is only executed if the exception occurs
+}
+Example 1: Handling ArithmeticException (Unchecked)
+
+java
+public class ExceptionHandlingExample {
+    public static void main(String[] args) {
+        int a = 10;
+        int b = 0;
+
+        try {
+            // This line might throw an ArithmeticException
+            int result = a / b;
+            System.out.println("Result is: " + result);
+        } catch (ArithmeticException e) {
+            // This block runs ONLY if the exception occurs
+            System.err.println("Error: Cannot divide by zero!");
+            // e.printStackTrace(); // Optional: prints the full error details
+        }
+
+        System.out.println("Program continues after the try-catch block.");
+    }
+}
+Output:
+
+text
+Error: Cannot divide by zero!
+Program continues after the try-catch block.
+Key Point: Without the try-catch block, the program would have crashed at the division line. With it, the error is caught, handled gracefully, and the program continues.
+
+Example 2: Handling IOException (Checked)
+The compiler forces you to handle this.
+
+java
+import java.io.*;
+
+public class FileExample {
+    public void readFile() {
+        // The compiler will ERROR here if you don't handle FileNotFoundException
+        try {
+            FileReader file = new FileReader("nonexistentfile.txt");
+        } catch (FileNotFoundException e) {
+            System.out.println("Sorry, I couldn't find that file.");
+            e.printStackTrace();
+        }
+    }
+}
+The Full Mechanism: try-catch-finally
+You can add a finally block to the structure. The code inside a finally block always executes, whether an exception occurs or not.
+
+Why is this crucial? It's the perfect place to put cleanup code, like closing files, database connections, or network sockets. This ensures resources are freed even if something goes wrong.
+
+Syntax:
+
+java
+try {
+    // Risky code
+} catch (ExceptionType e) {
+    // Handle exception
+} finally {
+    // Cleanup code (always executes)
+}
+Example:
+
+java
+import java.io.*;
+
+public class FinallyExample {
+    public static void main(String[] args) {
+        FileReader reader = null;
+        try {
+            reader = new FileReader("somefile.txt");
+            // Read from the file...
+            int data = reader.read();
+            // Let's simulate an exception
+            int badMath = 10 / 0; // This will throw an ArithmeticException!
+
+        } catch (IOException | ArithmeticException e) { // Catching multiple exceptions
+            System.out.println("An error occurred: " + e.getMessage());
+        } finally {
+            System.out.println("This 'finally' block is executing for cleanup.");
+            // This code runs no matter what happened in the try or catch blocks.
+            if (reader != null) {
+                try {
+                    reader.close(); // Ensure the file is always closed!
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+}
+Output:
+
+text
+An error occurred: / by zero
+This 'finally' block is executing for cleanup.
+Even though an exception was thrown, the finally block ran and ensured the file was closed.
+
+Alternative to Handling: The throws Keyword
+Sometimes, it's better for the method that generates the exception to not handle it itself. Instead, it can "duck" the responsibility and let the caller of the method handle it. This is done using the throws clause in the method signature.
+
+Example:
+
+java
+import java.io.*;
+
+public class ThrowsExample {
+
+    // This method declares it might throw a FileNotFoundException.
+    // It does NOT handle it itself.
+    public void readFile() throws FileNotFoundException {
+        FileReader file = new FileReader("nonexistentfile.txt");
+        // ... other code ...
+    }
+
+    // Now, the main method must handle the exception thrown by readFile()
+    public static void main(String[] args) {
+        ThrowsExample example = new ThrowsExample();
+        try {
+            example.readFile(); // Call the risky method
+        } catch (FileNotFoundException e) {
+            System.out.println("Main method handled the exception.");
+        }
+    }
+}
+Summary for Your Interview
+"Exception handling in Java is managed through a try-catch-finally mechanism. Code that might throw an exception is placed inside a try block. If an exception occurs, it is caught and handled in a corresponding catch block. The finally block is used for cleanup code and always executes, regardless of whether an exception was thrown."
+
+"Java has two main types of exceptions: checked exceptions, which the compiler forces you to handle, and unchecked exceptions (RuntimeExceptions), which are usually programming errors and optional to handle. If a method doesn't want to handle an exception itself, it can declare that it throws the exception for its caller to handle."
+
+-----------------------------------------------------------------------------------------------------------------------------
