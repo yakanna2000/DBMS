@@ -3400,3 +3400,1386 @@ Summary for Your Interview
 "Java has two main types of exceptions: checked exceptions, which the compiler forces you to handle, and unchecked exceptions (RuntimeExceptions), which are usually programming errors and optional to handle. If a method doesn't want to handle an exception itself, it can declare that it throws the exception for its caller to handle."
 
 -----------------------------------------------------------------------------------------------------------------------------
+
+26.What are threads?
+
+
+🔹 What are Threads in Java?
+
+👉 In Java, a thread is the smallest independent unit of execution within a process.
+
+A process is just a running program.
+
+A process can have one thread (single-threaded) or many threads (multi-threaded) working together.
+
+Each thread performs a separate task independently, which helps the program do more than one thing at the same time (multitasking).
+
+➡️ Example: While watching a YouTube video:
+
+One thread plays the video,
+
+Another thread streams the audio,
+
+Another thread downloads buffering data in the background.
+
+All of these threads belong to the same YouTube process, but they work in parallel.
+
+
+
+1. Ways to Create a Thread
+There are two primary ways to create a thread in Java.
+
+Method 1: By Extending the Thread Class
+You create a new class that inherits from Thread and override its run() method. The run() method defines the code that constitutes the new thread's task.
+
+java
+class Chef extends Thread { // Chef is a Thread
+    private String task;
+
+    public Chef(String task) {
+        this.task = task;
+    }
+
+    @Override
+    public void run() { // This is the task the thread will perform
+        for (int i = 1; i <= 3; i++) {
+            System.out.println(Thread.currentThread().getName() + " is " + task + " (Step " + i + ")");
+            try {
+                Thread.sleep(1000); // Simulate time taken for the task
+            } catch (InterruptedException e) {
+                System.out.println("Thread was interrupted!");
+            }
+        }
+        System.out.println(Thread.currentThread().getName() + " finished " + task);
+    }
+}
+
+public class Kitchen {
+    public static void main(String[] args) {
+        // Create Thread objects (Hire the chefs)
+        Chef chef1 = new Chef("Chopping Vegetables");
+        Chef chef2 = new Chef("Grilling Meat");
+
+        // Start the threads (Tell the chefs to start working)
+        chef1.start(); // DO NOT call run() directly! start() launches a new thread.
+        chef2.start();
+
+        // The main thread (the head chef) continues its own work
+        System.out.println("Head chef is managing the kitchen.");
+    }
+}
+Possible Output (Order is unpredictable!):
+
+text
+Head chef is managing the kitchen.
+Thread-1 is Grilling Meat (Step 1)
+Thread-0 is Chopping Vegetables (Step 1)
+Thread-0 is Chopping Vegetables (Step 2)
+Thread-1 is Grilling Meat (Step 2)
+Thread-0 is Chopping Vegetables (Step 3)
+Thread-1 is Grilling Meat (Step 3)
+Thread-0 finished Chopping Vegetables
+Thread-1 finished Grilling Meat
+Crucial Point: You call the start() method, not run(). start() tells the JVM to create a new thread and then call the run() method on that new thread. Calling run() directly would simply execute the method in the current thread like any other method call, defeating the purpose of multithreading.
+
+Method 2: By Implementing the Runnable Interface (Recommended)
+This is the more common and flexible approach. Since Java only allows single inheritance, implementing the Runnable interface allows your class to inherit from another class if needed.
+
+java
+// A Chef is now a Runnable task, not a Thread itself.
+class ChefRunnable implements Runnable {
+    private String task;
+
+    public ChefRunnable(String task) {
+        this.task = task;
+    }
+
+    @Override
+    public void run() { // The task is defined in run()
+        for (int i = 1; i <= 3; i++) {
+            System.out.println(Thread.currentThread().getName() + " is " + task + " (Step " + i + ")");
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                System.out.println("Thread was interrupted!");
+            }
+        }
+    }
+}
+
+public class KitchenWithRunnable {
+    public static void main(String[] args) {
+        // Create the tasks (The work orders)
+        Runnable task1 = new ChefRunnable("Chopping Vegetables");
+        Runnable task2 = new ChefRunnable("Grilling Meat");
+
+        // Create Thread objects and assign the tasks (Hire chefs and give them work orders)
+        Thread chefThread1 = new Thread(task1, "Chef Mario"); // Naming the thread
+        Thread chefThread2 = new Thread(task2, "Chef Luigi");
+
+        // Start the threads
+        chefThread1.start();
+        chefThread2.start();
+
+        System.out.println("Head chef is managing the kitchen.");
+    }
+}
+Why is this better? It separates the task (Runnable) from the thread of execution (Thread). You can pass the same Runnable task to multiple threads or submit it to a thread pool, offering greater flexibility.
+
+
+2. The Thread Lifecycle (States)
+A thread can be in one of several states, defined in the Thread.State enum:
+
+NEW: A thread is in this state after it is created (new Thread()) but before the start() method is called. It is not yet considered alive.
+
+RUNNABLE: After start() is called, the thread is in the runnable state. It is waiting for the thread scheduler to allocate CPU time to it. It's in a ready-to-run pool.
+
+RUNNING: The thread scheduler has selected it, and its run() method is executing.
+
+BLOCKED/WAITING: The thread is alive but not eligible to run. It is waiting for a monitor lock (synchronization) to enter a synchronized block (BLOCKED) or waiting for another thread to perform a particular action (WAITING), often via object.wait() or thread.join().
+
+TIMED_WAITING: The thread is waiting for a specified period. It enters this state by calling Thread.sleep(milliseconds), thread.join(milliseconds), or object.wait(milliseconds).
+
+TERMINATED: The thread has finished its execution (the run() method has exited). It is no longer alive.
+
+You can check a thread's state using thread.getState().
+
+
+3. Common Thread Methods
+start(): Begins thread execution; the JVM calls the run() method of this thread.
+
+run(): The method that contains the code executed by the thread.
+
+static sleep(long millis): Causes the currently executing thread to sleep (pause) for the specified number of milliseconds. This is a static method.
+
+join(): The current thread waits until the thread it is called on dies. E.g., thread2.join() in the main thread means "main thread, wait for thread2 to finish before you continue."
+
+static yield(): A hint to the thread scheduler that the current thread is willing to yield its current use of the processor. The scheduler is free to ignore this hint.
+
+interrupt(): Interrupts this thread. If the thread is sleeping or waiting, it will throw an InterruptedException, providing a way to gracefully stop a thread.
+
+isAlive(): Tests if this thread is alive (has been started and has not yet died).
+
+
+4. Advantages and Challenges
+Advantages:
+
+Improved Performance: Leverages multi-core CPUs by doing real parallel work.
+
+Improved Responsiveness: In GUI applications, the UI stays responsive while a background thread handles a long task (e.g., downloading a file).
+
+Efficient Resource Utilization: Threads share the same memory space within a process, making data sharing faster and more efficient than between processes.
+
+Challenges (Why Threading is Hard):
+
+Race Conditions: When the outcome depends on the unpredictable sequence of thread execution (e.g., two threads withdrawing money from the same account).
+
+Deadlocks: Two or more threads are blocked forever, each waiting for the other to release a lock.
+
+
+
+🔹 Real-life Analogy
+
+Think of a restaurant kitchen (process).
+
+Each chef is a thread.
+
+One chef makes pizza 🍕, another makes pasta 🍝, another prepares salad 🥗.
+
+They work at the same time, making the kitchen efficient → just like multithreading in Java.
+
+🔹 Advantages of Threads
+
+✅ Better CPU Utilization → CPU isn’t idle, tasks run in parallel.
+✅ Faster Execution → Multiple tasks can happen simultaneously.
+✅ Real-time Usage → Games, animations, chat apps, web servers.
+
+🔹 Disadvantages of Threads
+
+⚠️ Complex Debugging → Hard to trace issues when multiple threads run at once.
+⚠️ Synchronization Issues → When two threads access the same resource (like a bank account), it may lead to errors like race conditions or even deadlocks.
+
+✅ Interview Style Summary:
+"A thread in Java is the smallest unit of execution within a process. It allows multitasking by running multiple tasks in parallel. We can create threads by extending the Thread class or implementing Runnable. Threads go through a lifecycle from creation to termination. They improve performance and CPU utilization but require careful handling to avoid synchronization issues."
+
+Complexity: Debugging multithreaded code is significantly more difficult due to its non-deterministic nature.
+
+These challenges are solved using synchronization (synchronized keyword, Locks) and thread-safe classes from the java.util.concurrent package.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+🔹 Synchronization in Java (Detailed Explanation)
+1. Definition
+
+Synchronization in Java is the process that allows only one thread to access a shared resource (like a variable, method, or block of code) at a time.
+It helps in avoiding data inconsistency and race conditions when multiple threads work on the same resource.
+
+2. Why Synchronization is Needed?
+
+When multiple threads access the same shared resource without synchronization, it can lead to problems such as:
+
+Race condition → When two or more threads try to update the same variable at the same time, the final result becomes unpredictable.
+
+Data inconsistency → Final value of data may not be correct.
+
+Example of Problem (Without Synchronization):
+
+class Counter {
+    int count = 0;
+
+    public void increment() {
+        count++;
+    }
+}
+
+public class Test {
+    public static void main(String[] args) throws InterruptedException {
+        Counter c = new Counter();
+
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) c.increment();
+        });
+
+        Thread t2 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) c.increment();
+        });
+
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+
+        System.out.println("Final Count: " + c.count);
+    }
+}
+
+
+🔸 Expected Output = 2000
+🔸 Actual Output = Some random value (like 1738, 1899, etc.), because both threads update count at the same time.
+
+This is where synchronization is required.
+
+3. Types of Synchronization in Java
+
+Synchronized Method
+
+Declaring a method as synchronized means only one thread can access that method on a given object at a time.
+
+class Counter {
+    int count = 0;
+
+    public synchronized void increment() {
+        count++;
+    }
+}
+
+
+Synchronized Block
+
+Instead of synchronizing the whole method, you can synchronize only a part of the code.
+
+Useful when only a small portion needs protection, improving performance.
+
+class Counter {
+    int count = 0;
+
+    public void increment() {
+        synchronized(this) {
+            count++;
+        }
+    }
+}
+
+
+Static Synchronization
+
+When we use synchronized with a static method, lock is applied on the class object, not on the instance.
+
+This ensures synchronization across all objects of the class.
+
+class Counter {
+    static int count = 0;
+
+    public static synchronized void increment() {
+        count++;
+    }
+}
+
+4. Locks in Synchronization
+
+Every object in Java has a unique lock (monitor).
+
+When a thread enters a synchronized method/block, it acquires the object’s lock.
+
+Other threads trying to access synchronized code on the same object must wait until the lock is released.
+
+5. Advantages
+
+✅ Prevents race conditions
+✅ Maintains data consistency
+✅ Provides thread-safety
+
+6. Disadvantages
+
+❌ Performance overhead (threads wait in line).
+❌ May cause deadlock if not used carefully.
+❌ Reduced concurrency.
+
+7. Real-Life Analogy
+
+Imagine a washroom with one key (lock).
+
+Only one person (thread) can enter at a time.
+
+If someone is inside, others must wait until the key is free.
+
+This ensures no two people use it simultaneously (just like threads accessing shared data).
+
+8. Final Example with Synchronization
+class Counter {
+    int count = 0;
+
+    public synchronized void increment() {
+        count++;
+    }
+}
+
+public class Test {
+    public static void main(String[] args) throws InterruptedException {
+        Counter c = new Counter();
+
+        Thread t1 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) c.increment();
+        });
+
+        Thread t2 = new Thread(() -> {
+            for (int i = 0; i < 1000; i++) c.increment();
+        });
+
+        t1.start();
+        t2.start();
+        t1.join();
+        t2.join();
+
+        System.out.println("Final Count: " + c.count);
+    }
+}
+
+
+✅ Now Output will always be 2000 (correct and consistent).
+
+✨ In summary:
+Synchronization in Java ensures that only one thread accesses a shared resource at a time, preventing race conditions and ensuring consistency, but at the cost of performance.
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+ 27.Why do we create threads
+
+Good question 👍 Let’s go step by step and elaborate in detail why we create threads in Java (or in any programming language).
+
+🔹 What are Threads?
+
+A thread is the smallest unit of execution in a program.
+
+By default, every Java program runs with one main thread.
+
+But sometimes, one thread is not enough, especially when we need to do multiple things at the same time → this is where creating additional threads comes in.
+
+🔹 Why Do We Create Threads?
+
+We create threads to improve performance, responsiveness, and efficiency.
+Here are the main reasons:
+
+1. Concurrency (Doing Multiple Tasks at Once)
+
+Without threads, tasks are executed one after another (sequentially).
+
+With threads, multiple tasks can be executed simultaneously.
+
+📌 Example:
+Imagine a chat application →
+
+One thread handles sending messages.
+
+Another thread handles receiving messages.
+
+Both can happen at the same time → user doesn’t feel any delay.
+
+2. Better CPU Utilization
+
+Modern computers have multi-core processors.
+
+Creating multiple threads allows us to use all CPU cores instead of just one.
+
+📌 Example:
+If you process a large dataset, splitting the work into multiple threads can finish it faster.
+
+Thread 1 → first part of dataset
+
+Thread 2 → second part
+
+Both run in parallel → total time reduces.
+
+3. Improved Application Responsiveness
+
+In GUI (Graphical User Interface) applications, the main thread controls the user interface.
+
+If the main thread gets busy (e.g., downloading a file), the application may freeze.
+
+By creating a separate worker thread for the heavy task, the main thread remains free to respond to user actions.
+
+📌 Example:
+In a music player:
+
+One thread → plays music.
+
+Another thread → updates progress bar.
+
+Another thread → handles user input (pause/next).
+
+4. Asynchronous Behavior
+
+Some tasks take a long time (like database queries, file downloads, or network calls).
+
+Using threads, these tasks can run in the background, so the program doesn’t stop.
+
+📌 Example:
+
+Thread 1 → User continues browsing.
+
+Thread 2 → Downloads a file in the background.
+
+5. Real-time Applications
+
+In real-world systems like gaming, banking, or IoT, multiple things happen at once.
+
+Threads allow these real-time events to be handled smoothly.
+
+📌 Example:
+In a game:
+
+One thread → renders graphics.
+
+One thread → listens to keyboard/mouse input.
+
+One thread → plays background music.
+
+🔹 Example in Java
+class MyThread extends Thread {
+    public void run() {
+        for(int i=1; i<=5; i++) {
+            System.out.println(Thread.currentThread().getName() + " - Count: " + i);
+            try { Thread.sleep(500); } catch(Exception e) {}
+        }
+    }
+}
+
+public class ThreadExample {
+    public static void main(String[] args) {
+        MyThread t1 = new MyThread();
+        MyThread t2 = new MyThread();
+
+        t1.start(); // Thread 1 starts
+        t2.start(); // Thread 2 starts
+    }
+}
+
+Output (may vary because threads run in parallel):
+Thread-0 - Count: 1
+Thread-1 - Count: 1
+Thread-0 - Count: 2
+Thread-1 - Count: 2
+...
+
+
+Here, both threads run at the same time, improving concurrency.
+
+🔹 Real-Life Analogy
+
+Think of a restaurant:
+
+Without threads → One waiter takes orders, serves food, collects bills sequentially → customers wait.
+
+With threads → Multiple waiters (threads) handle tasks simultaneously → service is faster and smoother.
+
+✅ In summary:
+We create threads to:
+
+Perform multiple tasks at once (concurrency)
+
+Utilize multi-core CPUs efficiently
+
+Keep applications responsive
+
+Run background tasks without blocking
+
+Support real-time operations
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+28.What's the use of threads ?
+
+
+
+Great question 👍 Let’s go step by step and elaborate the use of threads in Java:
+
+🔹 28. What’s the use of Threads?
+
+A thread is a lightweight sub-process — the smallest unit of execution within a program.
+In Java, threads are mainly used to perform multiple tasks concurrently without blocking the main program.
+
+✅ Uses of Threads in Java
+
+Concurrency / Parallelism
+
+Threads allow multiple tasks to run at the same time.
+
+Example: In a web browser → one thread loads the webpage, another thread plays video, another downloads files.
+
+Without threads, tasks would run sequentially, making applications slow.
+
+Improved Performance
+
+Threads help utilize CPU power effectively (especially multi-core processors).
+
+Different threads can run on different cores, increasing performance.
+
+Example: A gaming application can use:
+
+One thread for graphics rendering
+
+One thread for background music
+
+One thread for user input handling
+
+Better Responsiveness
+
+Applications don’t "freeze" when performing heavy tasks.
+
+Example: In a GUI application:
+
+Main thread handles user interface
+
+Worker thread handles background tasks (file upload, DB query, etc.)
+
+This makes applications responsive.
+
+Resource Sharing
+
+Threads within the same process share the same memory and resources.
+
+Makes data sharing and communication faster than using separate processes.
+
+Example: A server application → multiple client requests handled by multiple threads.
+
+Asynchronous Programming
+
+Threads enable asynchronous tasks, meaning you don’t need to wait for one task to finish before starting another.
+
+Example: While a file is downloading in one thread, another thread can continue to show progress to the user.
+
+🔹 Example in Java
+class MyTask extends Thread {
+    public void run() {
+        for(int i = 1; i <= 5; i++) {
+            System.out.println("Task running in thread: " + i);
+            try {
+                Thread.sleep(500); // pause for half second
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+}
+
+public class ThreadUseExample {
+    public static void main(String[] args) {
+        MyTask t1 = new MyTask();
+        MyTask t2 = new MyTask();
+
+        t1.start(); // start first thread
+        t2.start(); // start second thread
+
+        System.out.println("Main thread running...");
+    }
+}
+
+
+🔸 Output (sample):
+
+Main thread running...
+Task running in thread: 1
+Task running in thread: 1
+Task running in thread: 2
+Task running in thread: 2
+...
+
+
+👉 Here, multiple threads run concurrently.
+
+🔹 Real-Life Analogy
+
+Think of a restaurant kitchen:
+
+One chef makes pizza 🍕
+
+Another chef makes pasta 🍝
+
+Another makes drinks 🥤
+
+All chefs (threads) work in parallel, serving customers faster.
+If only one chef (no threads) was present, all tasks would be sequential → very slow.
+
+✅ In summary:
+Threads are used in Java for concurrency, responsiveness, better CPU utilization, asynchronous execution, and resource sharing, making applications faster and more efficient.
+
+
+-----------------------------------------------------------------------------------------------------------------------------------
+
+29.Why do we synchronize threads?
+
+ChatGPT said:
+
+Good question 👍 Let’s go step by step.
+
+🔹 29. Why do we synchronize threads?
+
+👉 Synchronization in Java is used to control the access of multiple threads to shared resources.
+
+When multiple threads try to access the same object/data simultaneously, problems like data inconsistency, race conditions, and unexpected results can occur.
+
+To avoid this, we synchronize threads so that only one thread can access the shared resource at a time.
+
+🔹 Without Synchronization (Problem)
+
+Example: Two threads deposit money into the same bank account at the same time.
+
+class BankAccount {
+    int balance = 1000;
+
+    void deposit(int amount) {
+        balance = balance + amount;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        BankAccount account = new BankAccount();
+
+        // Thread 1
+        Thread t1 = new Thread(() -> {
+            account.deposit(500);
+        });
+
+        // Thread 2
+        Thread t2 = new Thread(() -> {
+            account.deposit(700);
+        });
+
+        t1.start();
+        t2.start();
+
+        // Wait for threads to finish
+        try {
+            t1.join();
+            t2.join();
+        } catch (Exception e) {}
+
+        System.out.println("Final Balance: " + account.balance);
+    }
+}
+
+
+💡 Expected Balance = 1000 + 500 + 700 = 2200
+But sometimes output may be 1700, 1500, or wrong value because both threads update the balance at the same time → Race Condition.
+
+🔹 With Synchronization (Solution)
+class BankAccount {
+    int balance = 1000;
+
+    synchronized void deposit(int amount) {
+        balance = balance + amount;
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        BankAccount account = new BankAccount();
+
+        Thread t1 = new Thread(() -> account.deposit(500));
+        Thread t2 = new Thread(() -> account.deposit(700));
+
+        t1.start();
+        t2.start();
+
+        try {
+            t1.join();
+            t2.join();
+        } catch (Exception e) {}
+
+        System.out.println("Final Balance: " + account.balance);
+    }
+}
+
+
+✅ Now, the output will always be 2200 because synchronization ensures only one thread at a time executes the deposit() method.
+
+🔹 Interview Point of View
+
+Why Synchronize Threads?
+
+To prevent race conditions.
+
+To ensure data consistency.
+
+To maintain thread safety.
+
+To avoid unexpected results in concurrent execution.
+
+
+-------------------------------------------------------------------------------------------------------------------------------------
+
+ 30.How does synchronization work?
+
+
+
+Great question 👍 Let’s go step by step so you clearly understand how synchronization works in Java.
+
+🔹 1. Problem Without Synchronization
+
+When multiple threads access a shared resource (like a variable, file, or object) at the same time, they may interfere with each other, leading to inconsistent results.
+👉 Example: Two people withdrawing money from the same bank account simultaneously. Without proper control, balance can become incorrect.
+
+🔹 2. Synchronization Concept
+
+Synchronization ensures that only ONE thread at a time can access a critical section (shared resource).
+It prevents race conditions and maintains data consistency.
+
+🔹 3. How It Works in Java
+
+Java provides synchronization using the synchronized keyword.
+
+When a method/block is declared synchronized:
+
+The thread acquires a lock (monitor) on the object.
+
+Other threads trying to enter the same synchronized method/block must wait until the lock is released.
+
+After the thread finishes execution, it releases the lock, allowing another thread to proceed.
+
+🔹 4. Ways to Synchronize
+(a) Synchronized Method
+class BankAccount {
+    private int balance = 1000;
+
+    // synchronized method
+    public synchronized void withdraw(int amount) {
+        balance -= amount;
+        System.out.println("Withdraw: " + amount + " | Balance: " + balance);
+    }
+}
+
+
+👉 Only one thread can execute withdraw() at a time on the same object.
+
+(b) Synchronized Block
+class BankAccount {
+    private int balance = 1000;
+
+    public void withdraw(int amount) {
+        synchronized(this) { // lock on current object
+            balance -= amount;
+            System.out.println("Withdraw: " + amount + " | Balance: " + balance);
+        }
+    }
+}
+
+
+👉 Only the critical section is locked, not the whole method (better performance).
+
+(c) Static Synchronization
+
+If method is static synchronized, lock is taken on the class, not on the object.
+
+class Bank {
+    private static int balance = 1000;
+
+    public static synchronized void withdraw(int amount) {
+        balance -= amount;
+        System.out.println("Withdraw: " + amount + " | Balance: " + balance);
+    }
+}
+
+🔹 5. Internal Working (Monitor Lock)
+
+Each object in Java has an intrinsic lock (also called monitor).
+
+synchronized tells a thread:
+
+Acquire the object’s lock before executing.
+
+Release lock when method/block execution completes.
+
+If another thread tries to enter before lock is released → it waits in BLOCKED state.
+
+🔹 6. Example with Multiple Threads
+class BankAccount {
+    private int balance = 1000;
+
+    public synchronized void withdraw(String name, int amount) {
+        System.out.println(name + " is withdrawing...");
+        balance -= amount;
+        System.out.println(name + " completed withdrawal. Balance: " + balance);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        BankAccount acc = new BankAccount();
+
+        Thread t1 = new Thread(() -> acc.withdraw("Alice", 500));
+        Thread t2 = new Thread(() -> acc.withdraw("Bob", 500));
+
+        t1.start();
+        t2.start();
+    }
+}
+
+
+✅ Output will be consistent:
+
+Alice is withdrawing...
+Alice completed withdrawal. Balance: 500
+Bob is withdrawing...
+Bob completed withdrawal. Balance: 0
+
+
+❌ Without synchronized, output may be wrong (balance negative or incorrect).
+
+🔹 7. Interview Point of View
+
+Why synchronization? → To avoid race conditions and ensure data consistency.
+
+How it works? → Uses object/class lock (monitor). Only one thread executes at a time.
+
+Where to use? → When threads share resources (bank account, files, DB connection).
+
+Drawback? → Slower performance due to locking and waiting.
+
+---------------------------------------------------------------------------------------------------------------------
+32. What are different packages used in Java? What are the classes present in them?
+
+
+In Java, packages are used to group related classes, interfaces, and sub-packages.
+
+They act like folders in a file system.
+
+They help in modularity, code reuse, and avoiding name conflicts.
+
+There are two types of packages:
+
+Built-in packages (provided by Java)
+
+User-defined packages (created by developers)
+
+
+What is a Package?
+A package in Java is a namespace that organizes a set of related classes and interfaces. Think of it as a folder on your computer where you keep related files.
+
+Purposes:
+
+Organization: Prevents naming conflicts. You can have a com.company.Model class and an org.library.Model class.
+
+Access Control: Provides a fourth access level, package-private (default), where members are visible only within their own package.
+
+Reusability: Makes it easy to find and use related classes.
+
+1. java.lang - The Core Package
+This is the most fundamental package. It is automatically imported into every Java program. You don't need to write import java.lang.*;.
+
+Key Classes & Examples:
+
+Object: The root class of every class hierarchy.
+
+java
+Object obj = new String("Hello");
+System.out.println(obj.toString()); // Calls String's toString()
+System.out.println(obj.hashCode()); // Prints the hash code
+String: Represents immutable sequences of characters.
+
+java
+String message = "Hello, World!";
+int length = message.length(); // 13
+String sub = message.substring(0, 5); // "Hello"
+Math: Provides common mathematical functions.
+
+java
+double root = Math.sqrt(25.0); // 5.0
+double power = Math.pow(2, 3); // 8.0
+double randomNum = Math.random(); // Random num between 0.0 and 1.0
+System: Provides access to system resources.
+
+java
+System.out.println("This goes to standard output (console)");
+System.err.println("This goes to standard error");
+long time = System.currentTimeMillis(); // Current time in milliseconds
+Wrapper Classes: Integer, Double, Boolean, Character, etc., used to represent primitives as objects.
+
+java
+Integer num = Integer.valueOf(10); // Convert int to Integer
+int value = num.intValue(); // Convert Integer back to int
+int parsed = Integer.parseInt("123"); // Convert String to int
+2. java.util - The Utility Package
+This package contains the Java Collections Framework, date/time utilities, and other helper classes. It's one of the most frequently used packages.
+
+Key Classes & Examples:
+
+Collections Framework: Data structures for storing and manipulating groups of objects.
+
+ArrayList: A resizable array.
+
+java
+ArrayList<String> list = new ArrayList<>();
+list.add("Apple");
+list.add("Banana");
+String fruit = list.get(0); // "Apple"
+HashMap: Stores key-value pairs.
+
+java
+HashMap<String, Integer> map = new HashMap<>();
+map.put("Alice", 25);
+map.put("Bob", 30);
+int age = map.get("Alice"); // 25
+HashSet: A collection that prevents duplicates.
+
+java
+HashSet<Integer> numbers = new HashSet<>();
+numbers.add(1);
+numbers.add(1); // Duplicate, won't be added
+System.out.println(numbers.size()); // 1
+Scanner: A simple text scanner to parse primitive types and strings.
+
+java
+Scanner scanner = new Scanner(System.in);
+System.out.print("Enter your name: ");
+String name = scanner.nextLine();
+System.out.println("Hello, " + name);
+scanner.close();
+3. java.io - The Input/Output Package
+This package provides classes for system input and output through data streams, serialization, and the file system.
+
+Key Classes & Examples:
+
+File: An abstract representation of file and directory pathnames.
+
+java
+File file = new File("myfile.txt");
+if (file.exists()) {
+    System.out.println("File size: " + file.length() + " bytes");
+}
+FileReader / FileWriter: For reading and writing character files.
+
+BufferedReader / BufferedWriter: Wrap around readers/writers to buffer input/output for efficiency.
+
+java
+// Reading a file
+try (BufferedReader reader = new BufferedReader(new FileReader("input.txt"))) {
+    String line;
+    while ((line = reader.readLine()) != null) {
+        System.out.println(line);
+    }
+} catch (IOException e) {
+    e.printStackTrace();
+}
+4. java.sql - The Database Package
+This package provides the API for accessing and processing data stored in a relational database (JDBC - Java Database Connectivity).
+
+Key Classes & Examples:
+
+DriverManager: Manages JDBC drivers.
+
+Connection: A connection to a specific database.
+
+Statement / PreparedStatement: Used to execute SQL queries.
+
+ResultSet: A table of data representing the results of a query.
+
+java
+// Basic structure of a JDBC call (requires a database driver JAR)
+String url = "jdbc:mysql://localhost:3306/mydatabase";
+String user = "root";
+String password = "password";
+
+try (Connection conn = DriverManager.getConnection(url, user, password);
+     Statement stmt = conn.createStatement();
+     ResultSet rs = stmt.executeQuery("SELECT * FROM users")) {
+
+    while (rs.next()) {
+        int id = rs.getInt("id");
+        String name = rs.getString("name");
+        System.out.println(id + ": " + name);
+    }
+} catch (SQLException e) {
+    e.printStackTrace();
+}
+5. java.net - The Networking Package
+This package provides classes for implementing networking applications.
+
+Key Classes & Examples:
+
+URL: Represents a Uniform Resource Locator.
+
+java
+try {
+    URL url = new URL("https://www.example.com");
+    BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+    String inputLine;
+    while ((inputLine = in.readLine()) != null) {
+        System.out.println(inputLine); // Prints the HTML source of the page
+    }
+    in.close();
+} catch (IOException e) {
+    e.printStackTrace();
+}
+6. java.time - The Modern Date/Time API (Java 8+)
+This package provides a comprehensive date and time model, replacing the old java.util.Date and Calendar classes.
+
+Key Classes & Examples:
+
+LocalDate: Represents a date without a time (year-month-day).
+
+java
+LocalDate today = LocalDate.now();
+LocalDate birthday = LocalDate.of(1990, Month.JANUARY, 1);
+long days = ChronoUnit.DAYS.between(birthday, today);
+LocalDateTime: Represents a date and time without a timezone.
+
+java
+LocalDateTime now = LocalDateTime.now();
+7. User-Defined Packages
+You can create your own packages to organize your project.
+
+1. Declare the package at the top of your Java file:
+
+java
+// File: com/company/utils/StringHelper.java
+package com.company.utils; // Package declaration
+
+public class StringHelper {
+    public static String capitalize(String str) {
+        if (str == null || str.isEmpty()) {
+            return str;
+        }
+        return str.substring(0, 1).toUpperCase() + str.substring(1);
+    }
+}
+2. Import and use the class in another file:
+
+java
+// File: com/company/Main.java
+package com.company;
+import com.company.utils.StringHelper; // Import statement
+
+public class Main {
+    public static void main(String[] args) {
+        String name = "jarus";
+        String capitalized = StringHelper.capitalize(name);
+        System.out.println(capitalized); // "Jarus"
+    }
+}
+Summary for Your Interview
+"Java provides a rich set of built-in packages. The most crucial one is java.lang, which is auto-imported and contains core classes like String, Object, and Math. The java.util package is essential for data structures like ArrayList and HashMap. For I/O operations, we use java.io, and for database connectivity, we use java.sql. Modern Java uses java.time for date and time manipulation. Finally, developers can create their own user-defined packages to organize their code logically and prevent naming conflicts."
+
+
+🎯 Summary for Interview Answer
+
+Packages group related classes.
+
+Built-in packages:
+
+java.lang (String, Math, Wrapper)
+
+java.util (Collections, Date, Calendar)
+
+java.io (File handling)
+
+java.sql (Database JDBC)
+
+java.net (Networking)
+
+java.time (Date & Time API)
+
+javax.swing & java.awt (GUI)
+
+User-defined packages: Created by developers for modularity
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------
+ 33.How do we set classpath in java
+
+
+What is the CLASSPATH?
+The CLASSPATH is one of the most important concepts in Java. It is a parameter—either an environment variable or a command-line argument—that tells the Java Virtual Machine (JVM) and the Java compiler (javac) where to look for user-defined classes and packages.
+
+Think of it like the PATH variable in your operating system, which tells the OS where to find executable programs. The CLASSPATH tells Java where to find executable classes.
+
+Why is it Needed?
+By default, the JVM only looks for classes in the current directory (.). If your classes are located elsewhere, or if you need to use external libraries (.jar files), you must explicitly tell Java where to find them by setting the CLASSPATH.
+
+If the CLASSPATH is not set correctly, you will encounter these common errors:
+
+Error: Could not find or load main class MyClass
+
+java.lang.ClassNotFoundException
+
+java.lang.NoClassDefFoundError
+
+How to Set the CLASSPATH
+There are three primary ways to set the classpath, listed from the most common to the least.
+
+1. Setting CLASSPATH from the Command Line (Temporary, Most Common)
+This is the most frequent and recommended way because it's explicit and specific to the application you are running. You use the -cp or -classpath option with the java and javac commands.
+
+Syntax:
+
+bash
+java -cp <path1>;<path2>... <main-class>
+javac -cp <path1>;<path2>... <source-file>.java
+On Windows, paths are separated by a semicolon (;).
+
+On Linux/Mac, paths are separated by a colon (:).
+
+Practical Examples:
+
+Example 1: Running a class in the current directory and a JAR file
+
+bash
+# Windows
+java -cp .;C:\libraries\mysql-connector-java-8.0.25.jar com.myapp.Main
+
+# Linux/Mac
+java -cp .:/home/user/libraries/mysql-connector-java-8.0.25.jar com.myapp.Main
+. (current directory) is where your com.myapp.Main class is located.
+
+The path to the JAR file is the external library (MySQL driver).
+
+Example 2: Compiling with a JAR on the classpath
+
+bash
+# Windows
+javac -cp .;C:\libraries\gson-2.8.8.jar MySourceFile.java
+
+# Linux/Mac
+javac -cp .:/home/user/libraries/gson-2.8.8.jar MySourceFile.java
+This is necessary if MySourceFile.java uses classes from the gson library.
+
+Example 3: Using a wildcard (*) to include all JARs in a directory
+You can use * to add every JAR file in a directory to the classpath.
+
+bash
+# Windows
+java -cp .;C:\libraries\* com.myapp.Main
+
+# Linux/Mac
+java -cp .:/home/user/libraries/* com.myapp.Main
+Important: The wildcard * does not recursively search subdirectories. It only matches JAR files in the specified directory. Also, do not add a space after the ; or :.
+
+2. Setting the CLASSPATH Environment Variable (Permanent, Less Common)
+This method sets a global CLASSPATH for every Java application you run. This is generally not recommended because it can lead to conflicts if different applications need different versions of libraries.
+
+On Windows:
+
+Open the Start Search, type "env", and select "Edit the system environment variables".
+
+Click the "Environment Variables..." button.
+
+Under "System variables", click "New...".
+
+Set the Variable name as CLASSPATH.
+
+Set the Variable value as your desired paths (e.g., .;C:\my_libs\*).
+
+Click OK and restart any open command prompts.
+
+On Linux/Mac:
+Add the following line to your shell profile file (e.g., ~/.bashrc, ~/.zshrc, or ~/.bash_profile):
+
+bash
+export CLASSPATH=".:/home/user/my_libs/*"
+Then, run source ~/.bashrc (or your respective file) to apply the changes.
+
+3. Setting the CLASSPATH in an IDE (Automatic, Easiest)
+IDEs like IntelliJ IDEA, Eclipse, and VS Code manage the classpath for you automatically through their build path or module settings. You don't use command-line arguments.
+
+You typically add JAR files by right-clicking your project -> Open Module Settings -> Libraries -> + -> Java.
+
+The IDE internally constructs the correct -cp argument when it runs your code.
+
+This is the preferred method for development as it is project-specific and much easier to manage.
+
+The Default CLASSPATH
+If you don't specify a -cp option and the CLASSPATH environment variable is not set, the JVM defaults to using the current directory (.). This is why a simple java MyClass works if MyClass.class is in the folder you are running the command from.
+
+Summary for Your Interview
+"The CLASSPATH is a parameter that tells the JVM where to search for user-defined classes and external libraries. The most common and recommended way to set it is temporarily from the command line using the -cp or -classpath option when invoking java or javac. This allows you to specify the current directory with a dot (.) and the paths to any required JAR files. While it's possible to set a permanent CLASSPATH environment variable, it's not recommended due to potential conflicts between applications. For day-to-day development, IDes like IntelliJ handle classpath management automatically through their build configuration menus."
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+🔹 What are Access Modifiers?
+
+Access Modifiers in Java are keywords used to set the visibility (scope) of classes, methods, and variables.
+They define "who can access what" in a program.
+
+Java provides 4 types of access modifiers:
+
+public
+
+protected
+
+default (no modifier)
+
+private
+
+🔹 1. public
+
+Accessible from anywhere in the program (same class, same package, different package).
+
+Used when you want your method/class to be available everywhere.
+
+✅ Example:
+
+package p1;
+
+public class A {
+    public void show() {
+        System.out.println("Public Method in A");
+    }
+}
+
+package p2;
+import p1.A;
+
+public class B {
+    public static void main(String[] args) {
+        A obj = new A();  
+        obj.show();  // ✅ Accessible (public)
+    }
+}
+
+🔹 2. protected
+
+Accessible:
+
+Within the same package.
+
+From subclasses (even if they are in a different package).
+
+Not accessible directly from a non-subclass in another package.
+
+✅ Example:
+
+package p1;
+
+public class A {
+    protected void display() {
+        System.out.println("Protected Method in A");
+    }
+}
+
+package p2;
+import p1.A;
+
+class B extends A {
+    public static void main(String[] args) {
+        B obj = new B();
+        obj.display();  // ✅ Accessible (because B extends A)
+    }
+}
+
+🔹 3. default (no modifier)
+
+If you don’t write any modifier, Java uses package-private.
+
+Accessible only within the same package.
+
+Cannot be accessed from a different package (even by subclass).
+
+✅ Example:
+
+package p1;
+
+class A {   // default class
+    void message() {  // default method
+        System.out.println("Default Method in A");
+    }
+}
+
+public class TestA {
+    public static void main(String[] args) {
+        A obj = new A();
+        obj.message();  // ✅ Accessible (same package)
+    }
+}
+
+package p2;
+import p1.A;   // ❌ Error: A is not public
+
+public class B {
+    public static void main(String[] args) {
+        // A obj = new A();  // ❌ Not accessible (different package)
+    }
+}
+
+🔹 4. private
+
+Accessible only within the same class.
+
+Not visible in other classes, even in the same package.
+
+✅ Example:
+
+class BankAccount {
+    private int balance = 1000;
+
+    private void showBalance() {
+        System.out.println("Balance: " + balance);
+    }
+
+    public void accessBalance() {
+        showBalance();  // ✅ private method used inside same class
+    }
+}
+
+public class Test {
+    public static void main(String[] args) {
+        BankAccount acc = new BankAccount();
+        // acc.showBalance();  // ❌ Error: private method
+        acc.accessBalance();   // ✅ Allowed (via public method)
+    }
+}
+
+🔹 Access Modifier Table (Summary)
+Modifier	Same Class   	Same Package	 Subclass (diff package)  	Other Package
+public	  ✅ Yes	      ✅ Yes      	  ✅ Yes                  	✅ Yes
+protected	✅ Yes	      ✅ Yes    	    ✅ Yes                   ❌ No
+default 	✅ Yes	      ✅ Yes	        ❌ No                   	❌ No
+private 	✅ Yes	      ❌ No	          ❌ No                    	❌ No
+
+👉 In short:
+
+private → Only within class
+
+default → Within package
+
+protected → Package + subclass (outside package also)
+
+public → Everywhere
+
+------------------------------------------------------------------------------------------------------------------------------
+
+
+
