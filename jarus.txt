@@ -6696,3 +6696,442 @@ React to user events (clicks, typing, etc.)
 ✅ In short:
 DOM elements are JavaScript objects that represent HTML tags inside the browser’s memory. They allow us to read, modify, and interact with the web page dynamically.
 
+---------------------------------------------------------------------------------------------------------------------------------------
+
+ Computer Networks:
+
+ 1. Tell me about HTTP protocol
+
+
+
+Perfect 👌 Let’s dive into HTTP Protocol step by step in an interview-friendly way:
+
+🔹 What is HTTP Protocol?
+
+HTTP (HyperText Transfer Protocol) is a communication protocol used on the web.
+
+It defines how messages (requests & responses) are formatted and transmitted between:
+
+Client (Browser / Mobile App / Frontend)
+
+Server (Backend / Database connected system).
+
+👉 In simple words: Whenever you open a website, your browser uses HTTP to talk to the server and fetch the content.
+
+🔹 How HTTP Works? (Step by Step)
+
+Client Sends Request
+
+You type https://example.com in your browser.
+
+Browser sends an HTTP request to the server.
+
+Example Request:
+
+GET /index.html HTTP/1.1
+Host: example.com
+
+
+Server Processes Request
+
+The server looks for /index.html.
+
+Prepares a response (HTML, JSON, or error message).
+
+Server Sends Response
+Example Response:
+
+HTTP/1.1 200 OK
+Content-Type: text/html
+Content-Length: 1024
+
+<html>
+  <body>Hello World</body>
+</html>
+
+
+Browser Renders Content
+
+The browser reads the response and displays it to the user.
+
+🔹 Features of HTTP
+
+Stateless → Each request is independent. The server doesn’t remember past requests (handled using cookies/sessions).
+
+Connectionless (in HTTP/1.0) → Each request/response closes connection. (Improved in HTTP/1.1, HTTP/2, HTTP/3).
+
+Flexible → Can transfer different data (HTML, JSON, images, videos, etc.).
+
+Text-based → Easy to read/debug request & response messages.
+
+🔹 HTTP Methods
+
+GET → Retrieve data (e.g., get all users).
+
+POST → Send data (e.g., add a new user).
+
+PUT → Update existing data.
+
+DELETE → Remove data.
+
+Example (API endpoint):
+
+GET /api/users → fetch all users
+POST /api/users → create new user
+
+🔹 HTTP Status Codes
+
+2xx (Success):
+
+200 OK → Request successful
+
+201 Created → Resource created
+
+3xx (Redirection):
+
+301 Moved Permanently
+
+302 Found
+
+4xx (Client Error):
+
+400 Bad Request
+
+401 Unauthorized
+
+404 Not Found
+
+5xx (Server Error):
+
+500 Internal Server Error
+
+503 Service Unavailable
+
+🔹 Real-Life Example
+
+When you log into Instagram:
+
+Browser sends a POST /login request with username & password.
+
+Server verifies and responds with JSON:
+
+{ "status": "success", "token": "abc123" }
+
+
+Next time you make a request, token is sent to authenticate.
+
+✅ In short (Interview Answer):
+“HTTP (Hypertext Transfer Protocol) is the foundation of communication on the web. It works as a request-response protocol between client and server, using methods like GET, POST, PUT, DELETE. It is stateless, supports multiple content types, and communicates through status codes. For example, when I open a website, my browser sends an HTTP request, the server responds with HTML/JSON, and my browser displays the result.”
+
+-------------------------------------------------------------------------------------------------------------------------------------------------
+
+https vs  http
+ChatGPT said:
+
+Great question 👍 Let’s break down HTTP vs HTTPS in a very clear way.
+
+🔹 What is HTTP?
+
+HTTP (HyperText Transfer Protocol)
+
+It is the protocol (rules) used for communication between web browsers and web servers.
+
+Example: when you type http://example.com, your browser sends an HTTP request to the server, and the server sends back a response.
+
+👉 But: HTTP is NOT secure because data is sent as plain text.
+Anyone (like a hacker) can intercept it.
+
+🔹 What is HTTPS?
+
+HTTPS (HyperText Transfer Protocol Secure)
+
+It is the secure version of HTTP.
+
+Uses SSL/TLS (Secure Socket Layer / Transport Layer Security) to encrypt data.
+
+Example: https://example.com
+
+👉 Data is encrypted, so even if someone intercepts it, they cannot read it.
+
+🔹 Main Differences
+Feature	HTTP	HTTPS
+Security	❌ Not secure (data is plain text)	✅ Secure (data is encrypted with SSL/TLS)
+Port	Port 80	Port 443
+Speed	Slightly faster (no encryption)	Slightly slower (encryption overhead, but very minor today)
+Data Protection	Vulnerable to hackers, sniffing, man-in-the-middle attacks	Protects from hackers, data remains private
+SEO (Google Ranking)	Google does not prefer HTTP sites	Google prefers HTTPS sites (better ranking)
+Browser Indicator	Shown as Not Secure in modern browsers	Shows a 🔒 lock icon
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+ 2. What is the URL and what resources can we get?
+
+
+
+Great question 👍 This is also a common Computer Networks + Web Development interview topic.
+Let’s go step by step 👇
+
+🔹 What is a URL?
+
+URL (Uniform Resource Locator) is the address of a resource on the internet.
+
+It tells the browser where to find something (like a web page, image, video, API data).
+
+Just like your home address helps someone locate your house, a URL helps locate a resource on the web.
+
+👉 Example:
+
+https://www.example.com:443/products?id=10#reviews
+
+🔹 Parts of a URL
+
+Protocol (Scheme)
+
+Defines how data is transferred.
+
+Example: http, https, ftp, ws
+
+https:// → Means data is transferred securely using SSL.
+
+Domain (Host)
+
+The website’s name or IP address.
+
+Example: www.example.com
+
+Port (Optional)
+
+Specifies the communication port.
+
+Example: :443 (default for HTTPS), :80 (default for HTTP).
+
+Path
+
+Location of the specific resource on the server.
+
+Example: /products
+
+Query String (Optional)
+
+Extra data sent to the server in key-value pairs.
+
+Example: ?id=10 → means product with id=10.
+
+Fragment (Optional)
+
+A pointer to a section within the resource (not sent to server).
+
+Example: #reviews → scroll directly to the “reviews” section.
+
+🔹 Resources We Can Get from a URL
+
+A URL can point to any type of resource, not just web pages. Examples:
+
+Web Pages (HTML files)
+
+Example: https://example.com/index.html
+
+APIs (JSON/XML data)
+
+Example: https://api.github.com/users/yakanna → Returns user details in JSON.
+
+Images
+
+Example: https://example.com/images/logo.png
+
+Videos & Audio
+
+Example: https://example.com/videos/intro.mp4
+
+Documents/Files
+
+Example: https://example.com/docs/report.pdf
+
+Scripts/Stylesheets
+
+Example: https://example.com/css/styles.css
+
+Example: https://example.com/js/app.js
+
+Streaming/Realtime Data
+
+Example: ws://chat.example.com → WebSocket for live chat.
+
+🔹 Real-Life Example
+
+If you open Instagram:
+
+URL: https://www.instagram.com/explore/
+
+Protocol → https
+
+Domain → instagram.com
+
+Path → /explore/
+
+The browser sends an HTTP request to this URL. The server responds with HTML, JSON, images, etc., and your browser displays the content.
+
+✅ Interview-Ready Answer:
+“A URL (Uniform Resource Locator) is the unique address of a resource on the internet. It specifies the protocol, domain, port, path, query parameters, and fragments. Using a URL, we can access different resources such as web pages, APIs (JSON data), images, videos, files, and real-time streams. For example, https://api.github.com/users returns user data in JSON, while https://example.com/logo.png returns an image.”
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+ 3. What is the NAT Gateway?How does it work?
+
+
+🔹 What is a NAT Gateway?
+
+NAT = Network Address Translation.
+
+A NAT Gateway is like a middleman between your private servers and the internet.
+
+👉 If your private server (like a database) needs to download updates or call an API from the internet:
+
+It sends the request to the NAT Gateway.
+
+The NAT Gateway sends it out to the internet using its own public IP.
+
+The response comes back to NAT Gateway, which then delivers it to your private server.
+
+📌 Key point:
+
+Private servers can go out to the internet.
+
+But the internet cannot directly reach your private servers.
+
+🔹 How does it work? (Step by Step)
+
+You have a private server (e.g., 10.0.1.5) with no public IP.
+
+The server wants to update software → sends request to the internet.
+
+The request first goes to the NAT Gateway.
+
+The NAT Gateway changes the private IP into its own public IP.
+
+Example: from 10.0.1.5 → 52.23.44.89.
+
+The internet responds to 52.23.44.89 (NAT’s public IP).
+
+NAT Gateway forwards the response back to the correct private server.
+
+🔹 Real-life Example
+
+Imagine a company office:
+
+Employees (private servers) don’t give their personal phone numbers to outsiders.
+
+Instead, they all call through the company’s main office phone number (NAT Gateway).
+
+Outsiders only see the office number, not each employee’s personal number.
+
+Outsiders cannot directly call employees (no inbound calls).
+
+🔹 Why do we need it?
+
+Security → private servers stay hidden.
+
+Internet access without exposure → servers can update software, install packages, call APIs.
+
+No need for multiple public IPs → saves cost and simplifies setup.
+
+✅ In one line (interview answer):
+“A NAT Gateway allows private servers to access the internet securely without being exposed to it. It translates private IPs into its own public IP for outgoing requests and forwards the responses back to the right server.”
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+4. What is the difference between Git and Github?
+
+
+Git vs GitHub (Simple Explanation)
+
+👉 Git = A tool you install on your computer.
+👉 GitHub = A website (online platform) where Git projects are stored and shared.
+
+🔹 What is Git?
+
+Git is a Version Control System (VCS).
+
+It helps developers track changes in code, go back to previous versions, and work on different features in parallel using branches.
+
+Works offline (only on your computer).
+
+👉 Example with Git:
+
+You write some code.
+
+Use git add → stage changes.
+
+Use git commit → save a snapshot of your project.
+
+All versions are saved in a hidden folder .git.
+
+🔹 What is GitHub?
+
+GitHub is an online platform that stores Git repositories in the cloud.
+
+It adds features Git alone doesn’t have:
+
+Sharing code with others.
+
+Pull Requests (for code review).
+
+Issues (to track bugs/features).
+
+Actions (to automate build/deploy).
+
+Needs internet.
+
+👉 Example with GitHub:
+
+You push (git push) your local Git commits to GitHub.
+
+Your team can pull (git pull) those commits.
+
+They can suggest changes via a Pull Request.
+
+Everyone collaborates on the same codebase.
+
+🔹 Analogy
+
+Git = Microsoft Word on your laptop (you can edit, save, and track changes offline).
+
+GitHub = Google Drive (where you upload your Word document so others can see, edit, and collaborate online).
+
+🔹 How They Work Together
+
+You create a project locally using Git.
+
+You commit changes (Git stores history).
+
+You connect your local Git repo to GitHub (git remote add origin).
+
+You push the code to GitHub.
+
+Your teammates clone the repo from GitHub.
+
+Everyone commits locally (with Git) and pushes/pulls from GitHub to sync.
+
+🔹 Key Difference Table (Simple)
+Aspect	Git	GitHub
+What it is	Version control system (tool)	Hosting platform (website)
+Runs on	Your computer	Cloud (online)
+Internet needed?	❌ No	✅ Yes
+Purpose	Track changes, version control	Collaboration, sharing, hosting
+Example	git commit -m "Fix bug"	github.com/user/repo
+
+✅ Interview-Friendly Answer (Simple):
+“Git is a version control tool that runs locally on your computer to track and manage code changes. GitHub is a cloud-based platform where Git repositories are stored and shared for collaboration. In short, Git manages code history, and GitHub makes teamwork around that code possible.”
+
+5. Common Misconceptions (Interview Traps)
+
+❌ Git and GitHub are the same → Wrong.
+
+❌ Git needs GitHub to work → Wrong (you can use Git without GitHub, e.g., GitLab, Bitbucket, or even local repos).
+
+❌ GitHub is open-source → Wrong (GitHub is owned by Microsoft; Git is open-source).
+
+
+
