@@ -1,1 +1,645 @@
 
+🌱 What is Spring Boot?
+
+Spring Boot is a framework built on top of Spring Framework.
+
+It makes it easier and faster to create standalone, production-ready applications in Java.
+
+With Spring Boot, you don’t need to write a lot of configuration code. It provides sensible defaults and automatically configures most things.
+
+⚡ Why use Spring Boot?
+
+Faster Development – You can create a working app quickly without spending hours on setup.
+
+Less Configuration – No need to manually configure everything (like database connections, web servers, etc.).
+
+Embedded Server – Comes with Tomcat/Jetty inside, so you don’t need to deploy WAR files separately. Just run the app like a normal Java program.
+
+Production-Ready – Has built-in tools like health checks, monitoring, and metrics.
+
+Integration with JPA, Security, REST, etc. – Very easy to integrate with databases, build REST APIs, secure your app, etc.
+
+---------------------------------------------------------------------------------------------------------------
+
+🔹 1. What is IoC (Inversion of Control)?
+
+Normally in Java, you create objects manually using new.
+
+In Spring, IoC inverts this control → instead of you creating objects, the Spring Container creates and manages them.
+
+This makes your code loose-coupled (classes depend less on each other).
+
+👉 Example (Without IoC):
+
+class Car {
+    Engine engine = new Engine();  // Manually creating dependency
+}
+
+
+👉 Example (With IoC):
+
+class Car {
+    Engine engine;   // No "new" here, Spring will inject it
+}
+
+
+So, IoC means giving control of object creation & lifecycle to Spring.
+
+🔹 2. What is DI (Dependency Injection)?
+
+Dependency Injection (DI) is a way to implement IoC.
+
+It means injecting required objects (dependencies) into a class instead of creating them inside the class.
+
+Spring provides this automatically using annotations.
+
+
+🔹 3. Types of Dependency Injection
+
+Constructor Injection – Dependencies are provided through the constructor.
+
+Setter Injection – Dependencies are provided through setter methods.
+
+Field Injection – Dependencies are injected directly into fields (not recommended for large apps, but common in demos).
+
+
+🔹 1. Constructor Injection
+
+👉 Dependencies are passed into the class through its constructor.
+✅ Best practice in Spring (because it makes classes immutable and easy to test).
+
+Engine.java
+import org.springframework.stereotype.Component;
+
+@Component
+public class Engine {
+    public void start() {
+        System.out.println("Engine started...");
+    }
+}
+
+Car.java (Constructor Injection)
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Car {
+    private final Engine engine;
+
+    // Constructor Injection
+    @Autowired
+    public Car(Engine engine) {
+        this.engine = engine;
+    }
+
+    public void drive() {
+        engine.start();
+        System.out.println("Car is moving...");
+    }
+}
+
+🔹 2. Setter Injection
+
+👉 Dependencies are passed through setter methods.
+✅ Useful if dependencies are optional or changeable after object creation.
+
+Car.java (Setter Injection)
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Car {
+    private Engine engine;
+
+    // Setter Injection
+    @Autowired
+    public void setEngine(Engine engine) {
+        this.engine = engine;
+    }
+
+    public void drive() {
+        engine.start();
+        System.out.println("Car is moving...");
+    }
+}
+
+🔹 3. Field Injection
+
+👉 Dependencies are injected directly into fields using @Autowired.
+❌ Not recommended for large apps (because it makes testing and immutability harder),
+✅ but very common in small apps or demos.
+
+Car.java (Field Injection)
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Car {
+
+    @Autowired
+    private Engine engine;   // Field Injection
+
+    public void drive() {
+        engine.start();
+        System.out.println("Car is moving...");
+    }
+}
+
+
+🔹 5. What happens here?
+
+@Component → Marks a class as a Spring-managed bean.
+
+@Autowired → Tells Spring to inject the dependency automatically.
+
+When you run the app:
+
+Spring Boot creates an IoC container (ApplicationContext).
+
+It creates objects of Engine and Car.
+
+It injects Engine into Car (DI).
+
+Finally, it calls car.drive() → output:
+
+Engine started...
+Car is moving...
+
+
+✅ Summary:
+
+IoC → Spring takes control of object creation & lifecycle.
+
+DI → Spring injects required objects into your class.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+🌱 Spring Framework
+
+Core Java framework (released in 2003).
+
+Provides features like IoC (Inversion of Control), DI (Dependency Injection), AOP (Aspect-Oriented Programming), etc.
+
+It is powerful but requires a lot of configuration (XML or annotations).
+
+By itself, it doesn’t include an embedded server — you need to deploy apps on external servers like Tomcat, JBoss, WebLogic.
+
+👉 Example (Spring Framework without Boot):
+You want to connect to a database → you must manually configure DataSource, EntityManagerFactory, TransactionManager in XML or Java config.
+
+🚀 Spring Boot
+
+Built on top of Spring Framework (introduced in 2014).
+
+Provides auto-configuration + embedded servers + production-ready tools.
+
+Removes boilerplate configuration by using convention over configuration.
+
+Comes with Spring Initializr (a website to quickly generate projects).
+
+👉 Example (Spring Boot):
+You just add spring-boot-starter-data-jpa in dependencies, and Boot automatically configures DataSource, EntityManagerFactory, TransactionManager for you.
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Nice 👍 You’ve now reached two important annotations in Spring Boot DI:
+@Primary and @Qualifier.
+Both help Spring resolve conflicts when multiple beans of the same type exist.
+
+🔹 Problem Scenario
+
+Imagine you have two Engine classes:
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class PetrolEngine {
+    public void start() {
+        System.out.println("Petrol engine started...");
+    }
+}
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class DieselEngine {
+    public void start() {
+        System.out.println("Diesel engine started...");
+    }
+}
+
+
+And in Car:
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class Car {
+    @Autowired
+    private PetrolEngine engine; // ❌ Problem: Which one to inject?
+}
+
+
+Spring will get confused because there are two beans (PetrolEngine, DieselEngine) of the same type.
+
+🔹 1. @Primary
+
+👉 Marks one bean as the default choice if multiple beans of the same type exist.
+
+Example
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Component;
+
+@Component
+@Primary   // Default bean
+public class PetrolEngine {
+    public void start() {
+        System.out.println("Petrol engine started...");
+    }
+}
+
+@Component
+public class DieselEngine {
+    public void start() {
+        System.out.println("Diesel engine started...");
+    }
+}
+
+
+Now in Car:
+
+@Component
+public class Car {
+    private final Engine engine;
+
+    @Autowired
+    public Car(Engine engine) {
+        this.engine = engine;
+    }
+
+    public void drive() {
+        engine.start();
+        System.out.println("Car is moving...");
+    }
+}
+
+
+👉 Output:
+
+Petrol engine started...
+Car is moving...
+
+
+✅ @Primary → PetrolEngine is injected by default.
+
+🔹 2. @Qualifier
+
+👉 If you want to explicitly choose which bean to inject, use @Qualifier("beanName").
+
+Example
+@Component("petrolEngine")
+public class PetrolEngine implements Engine {
+    public void start() {
+        System.out.println("Petrol engine started...");
+    }
+}
+
+@Component("dieselEngine")
+public class DieselEngine implements Engine {
+    public void start() {
+        System.out.println("Diesel engine started...");
+    }
+}
+
+
+Now in Car:
+
+@Component
+public class Car {
+    private final Engine engine;
+
+    @Autowired
+    public Car(@Qualifier("dieselEngine") Engine engine) { // Explicitly choosing DieselEngine
+        this.engine = engine;
+    }
+
+    public void drive() {
+        engine.start();
+        System.out.println("Car is moving...");
+    }
+}
+
+
+👉 Output:
+
+Diesel engine started...
+Car is moving...
+
+
+✅ @Qualifier → Used to choose a specific bean when multiple candidates exist.
+
+🔹 Interview Summary
+
+@Primary → Default bean when multiple beans of same type exist.
+
+@Qualifier → Explicitly specify which bean to use.
+
+You can combine both:
+
+@Primary sets the default.
+
+@Qualifier overrides it if needed.
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+🌱 Spring (Without Boot)
+
+Refers to the core Spring Framework.
+
+Provides features like:
+
+IoC (Inversion of Control)
+
+Dependency Injection (DI)
+
+AOP (Aspect Oriented Programming)
+
+Spring MVC (Model-View-Controller)
+
+Spring JDBC, Spring Data, Spring Security, etc.
+
+But without Boot, you must do all configurations manually.
+
+
+🔹 Characteristics of Spring (without Boot)
+
+Manual Configuration
+
+Define beans in applicationContext.xml or Java config class.
+
+Example:
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+           http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="engine" class="com.example.Engine"/>
+    <bean id="car" class="com.example.Car">
+        <property name="engine" ref="engine"/>
+    </bean>
+</beans>
+
+
+External Server Needed
+
+Apps are packaged as WAR and deployed on Tomcat/Jetty/JBoss manually.
+
+No Auto Configuration
+
+If you want database + JPA + transactions → you configure everything manually.
+
+More Boilerplate Code
+
+Setting up a project requires lots of setup files (web.xml, dispatcher-servlet.xml, etc.).
+
+
+
+🚀 Spring Boot (Difference)
+
+If we used Spring Boot instead:
+
+No XML config (just annotations like @Component, @Autowired).
+
+No external Tomcat needed (embedded).
+
+Auto-configuration (DB, JPA, REST, etc.).
+
+Just run java -jar app.jar → app runs instantly.
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+AOP
+
+Great question 👍 Let’s go step by step into Spring AOP (Aspect Oriented Programming).
+
+🔹 What is AOP?
+
+AOP = Aspect Oriented Programming
+
+It helps you separate cross-cutting concerns (code that is common across multiple modules).
+
+👉 Example of cross-cutting concerns:
+
+Logging
+
+Security (authentication/authorization)
+
+Transaction management
+
+Performance monitoring
+
+Instead of repeating these in every class, you define them once in an Aspect, and Spring applies them automatically.
+
+🔹 Core Concepts in Spring AOP
+
+Aspect
+
+A class that contains cross-cutting logic (e.g., logging, security).
+
+Advice
+
+The actual action taken (e.g., log before method execution).
+
+Types of Advice:
+
+@Before → run before method
+
+@After → run after method
+
+@AfterReturning → run after method successfully returns
+
+@AfterThrowing → run after exception
+
+@Around → run before and after method
+
+Join Point
+
+A point in the program where advice can be applied (e.g., method execution).
+
+Pointcut
+
+A condition that selects which methods should be intercepted.
+
+------------------------------------------------------------------------------------------------------------------------------------------------
+
+spring xml configuratuon
+
+
+Good question 👍 Let’s go into Spring XML Configuration in a clear and simple way.
+
+🔹 What is XML Configuration in Spring?
+
+Before annotations (@Component, @Autowired) and Java config (@Configuration), Spring beans were configured using XML files.
+
+You define beans inside applicationContext.xml.
+
+Then Spring IoC Container reads this XML and creates objects (beans).
+
+This was the old style (still useful to understand for interviews).
+
+🔹 Example 1: Basic Bean Configuration
+1. Create a simple class
+public class Engine {
+    public void start() {
+        System.out.println("🚗 Engine started...");
+    }
+}
+
+public class Car {
+    private Engine engine;
+
+    // Setter Injection
+    public void setEngine(Engine engine) {
+        this.engine = engine;
+    }
+
+    public void drive() {
+        engine.start();
+        System.out.println("🚙 Car is driving...");
+    }
+}
+
+2. Define beans in applicationContext.xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Engine Bean -->
+    <bean id="engine" class="com.example.Engine" />
+
+    <!-- Car Bean with dependency injection -->
+    <bean id="car" class="com.example.Car">
+        <property name="engine" ref="engine"/>
+    </bean>
+</beans>
+
+3. Load XML in Main Class
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+public class MainApp {
+    public static void main(String[] args) {
+        ApplicationContext context =
+                new ClassPathXmlApplicationContext("applicationContext.xml");
+
+        Car car = (Car) context.getBean("car");
+        car.drive();
+    }
+}
+
+🔹 Output
+🚗 Engine started...
+🚙 Car is driving...
+
+🔹 Key Points
+
+<bean> tag → defines a bean.
+
+id → bean name (used in getBean()).
+
+class → fully qualified class name.
+
+<property> → injects dependencies (Setter Injection).
+
+ref → refers to another bean.
+
+
+
+🔹 1. Setter Injection
+
+Dependency is injected through a setter method.
+
+Flexible → you can change dependencies later.
+
+Needs a no-args constructor.
+
+Example
+Engine.java
+public class Engine {
+    public void start() {
+        System.out.println("🚗 Engine started...");
+    }
+}
+
+Car.java
+public class Car {
+    private Engine engine;
+
+    // Setter method
+    public void setEngine(Engine engine) {
+        this.engine = engine;
+    }
+
+    public void drive() {
+        engine.start();
+        System.out.println("🚙 Car is driving...");
+    }
+}
+
+applicationContext.xml
+<bean id="engine" class="com.example.Engine" />
+
+<bean id="car" class="com.example.Car">
+    <property name="engine" ref="engine"/>
+</bean>
+
+
+✅ Here Spring will call setEngine() and inject the Engine bean.
+
+🔹 2. Constructor Injection
+
+Dependency is injected through the constructor.
+
+Makes dependencies mandatory.
+
+Better for immutability (dependencies can’t be changed after creation).
+
+Example
+Car.java
+public class Car {
+    private Engine engine;
+
+    // Constructor
+    public Car(Engine engine) {
+        this.engine = engine;
+    }
+
+    public void drive() {
+        engine.start();
+        System.out.println("🚙 Car is driving...");
+    }
+}
+
+applicationContext.xml
+<bean id="engine" class="com.example.Engine" />
+
+<bean id="car" class="com.example.Car">
+    <constructor-arg ref="engine"/>
+</bean>
+
+
+✅ Here Spring will call the constructor Car(Engine engine) to inject the dependency.
+------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
