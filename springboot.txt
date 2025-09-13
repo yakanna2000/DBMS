@@ -641,5 +641,200 @@ applicationContext.xml
 ✅ Here Spring will call the constructor Car(Engine engine) to inject the dependency.
 ------------------------------------------------------------------------------------------------------------------------------------------
 
+🔹 Ways of Autowiring in XML
 
+Spring XML provides the attribute autowire inside <bean>.
+It tells Spring how to inject dependencies automatically without writing <property> or <constructor-arg> every time.
+
+1. By Name
+
+Spring matches bean id with the property name.
+
+Example
+public class Engine {
+    public void start() {
+        System.out.println("🚗 Engine started...");
+    }
+}
+
+public class Car {
+    private Engine engine;
+
+    public void setEngine(Engine engine) {
+        this.engine = engine;
+    }
+
+    public void drive() {
+        engine.start();
+        System.out.println("🚙 Car is driving...");
+    }
+}
+
+applicationContext.xml
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Bean id matches property name "engine" -->
+    <bean id="engine" class="com.example.Engine" />
+
+    <bean id="car" class="com.example.Car" autowire="byName" />
+</beans>
+
+
+✅ Spring sees Car has a property engine.
+✅ Finds a bean with id="engine".
+✅ Injects automatically.
+
+2. By Type
+
+Spring matches bean class type with property type.
+
+<bean id="engine1" class="com.example.Engine" />
+<bean id="car" class="com.example.Car" autowire="byType" />
+
+
+✅ If there is only one Engine bean, Spring injects it.
+❌ If multiple beans of type Engine exist → error.
+
+3. Constructor
+
+Spring matches constructor argument types with available beans.
+
+public class Car {
+    private Engine engine;
+
+    public Car(Engine engine) {
+        this.engine = engine;
+    }
+
+    public void drive() {
+        engine.start();
+        System.out.println("🚙 Car is driving...");
+    }
+}
+
+<bean id="engine" class="com.example.Engine" />
+<bean id="car" class="com.example.Car" autowire="constructor" />
+
+
+✅ Spring calls the constructor and injects Engine.
+
+4. Autodetect (deprecated in newer Spring)
+
+First tries constructor, if not found → uses byType
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+🔹 1. What is Spring MVC?
+
+Spring MVC (Model-View-Controller) is a web framework provided by Spring.
+
+It follows the MVC pattern:
+
+Model → data & business logic (like Entities, DTOs, Services).
+
+View → UI layer (JSP, Thymeleaf, HTML, JSON).
+
+Controller → handles HTTP requests, processes them, and returns responses.
+
+Workflow of Spring MVC:
+
+Client sends a request → DispatcherServlet (front controller).
+
+DispatcherServlet → finds a matching controller.
+
+Controller processes the request → interacts with service & model.
+
+Response (View or JSON) returned to client.
+
+👉 Problem: In pure Spring MVC you must configure everything manually:
+
+Define DispatcherServlet in web.xml.
+
+Write @Configuration classes or XML to scan controllers.
+
+Add dependencies like Jackson, Hibernate Validator manually.
+
+Deploy app as a WAR file to an external server (Tomcat, Jetty).
+
+This is time-consuming and error-prone.
+
+🔹 2. What is Spring Boot MVC?
+
+Spring Boot MVC = Spring MVC + Auto Configuration + Embedded Server + Starter Dependencies.
+
+It’s not a new framework → it just makes using Spring MVC easier.
+
+Why We Need Spring Boot MVC (Advantages)
+
+👉 Interview-friendly answer:
+
+No web.xml or DispatcherServlet configuration
+
+In Spring MVC → you must define DispatcherServlet.
+
+In Spring Boot → it is auto-configured.
+
+Embedded Server
+
+Spring MVC → needs external Tomcat/Jetty.
+
+Spring Boot → comes with embedded Tomcat/Jetty → just run java -jar app.jar.
+
+Starter Dependencies
+
+Instead of searching for correct versions of libraries, Boot provides spring-boot-starter-web (includes Spring MVC + Jackson + Validation + Tomcat).
+
+Auto-Configuration
+
+JSON conversion, Validation, ViewResolvers, MessageConverters → Boot configures automatically.
+
+Faster Development
+
+@RestController + @GetMapping → instantly get REST APIs.
+
+Production Ready
+
+Health check, metrics, logging, security built-in (spring-boot-starter-actuator).
+
+🔹 3. Example: REST API with Spring Boot MVC
+pom.xml
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+
+DemoApplication.java
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication // enables auto-configuration + component scan + config
+public class DemoApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(DemoApplication.class, args);
+    }
+}
+
+HelloController.java
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController  // tells Spring Boot to return JSON/text response
+public class HelloController {
+
+    @GetMapping("/hello")
+    public String sayHello() {
+        return "🚀 Hello from Spring Boot MVC!";
+    }
+}
+
+
+👉 Run the app (mvn spring-boot:run or java -jar target/app.jar)
+👉 Open http://localhost:8080/hello → Response:
+
+🚀 Hello from Spring Boot MVC!
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
