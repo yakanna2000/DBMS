@@ -663,6 +663,23 @@ void levelOrderTraversal(TreeNode root) {
     }
 }
 // Output: 10, 5, 15, 3, 7, 20
+
+
+🧠 If you want DFS using Stack (iterative, no recursion)
+void dfsUsingStack(TreeNode root) {
+    if (root == null) return;
+
+    Stack<TreeNode> stack = new Stack<>();
+    stack.push(root);
+
+    while (!stack.isEmpty()) {
+        TreeNode node = stack.pop();
+        System.out.print(node.value + " ");
+
+        if (node.right != null) stack.push(node.right);
+        if (node.left != null) stack.push(node.left);
+    }
+}
 ------------------------------------------------------------------------------------------------------------
  3. What is input and output buffering?
 
