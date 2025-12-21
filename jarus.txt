@@ -773,6 +773,268 @@ Input/Output buffering is mainly used to improve performance by minimizing the n
 
 In Java, classes like BufferedReader, BufferedWriter, BufferedInputStream, and BufferedOutputStream use buffering.
 
+
+
+Difference between HashMap vs Hashtable (Java) — Simple & Interview-Focused
+https://i.sstatic.net/mLpKn.png?utm_source=chatgpt.com(diagram)
+4
+1️⃣ Basic Definition
+HashMap
+
+Part of Java Collections Framework
+
+Not synchronized
+
+Faster
+
+Allows one null key and multiple null values
+
+Hashtable
+
+Legacy class (Java 1.0)
+
+Synchronized
+
+Slower
+
+Does NOT allow null key or null value
+
+2️⃣ Key Differences (Very Important)
+Feature	HashMap	Hashtable
+Synchronization	❌ Not synchronized	✅ Synchronized
+Thread-safe	❌ No	✅ Yes
+Performance	🚀 Faster	🐢 Slower
+Null key	✅ Allowed (1)	❌ Not allowed
+Null values	✅ Allowed	❌ Not allowed
+Introduced in	Java 1.2	Java 1.0 (Legacy)
+Iterator	Fail-fast	Enumerator (Not fail-fast)
+3️⃣ Null Handling (Interview Favorite)
+HashMap
+Map<Integer, String> map = new HashMap<>();
+map.put(null, "A");
+map.put(1, null);
+map.put(2, null);
+
+
+✅ Valid
+
+Hashtable
+Map<Integer, String> table = new Hashtable<>();
+table.put(null, "A");   // NullPointerException
+table.put(1, null);     // NullPointerException
+
+
+❌ Runtime Exception
+
+4️⃣ Thread Safety Difference
+Hashtable
+
+Every method is synchronized
+
+Only one thread can access at a time
+
+Causes performance overhead
+
+HashMap
+
+No synchronization
+
+Multiple threads can access simultaneously
+
+Faster, but not safe in multithreading
+
+👉 If thread safety is needed with HashMap:
+
+Map<Integer, Integer> map =
+    Collections.synchronizedMap(new HashMap<>());
+
+5️⃣ Fail-Fast vs Fail-Safe
+HashMap → Fail-Fast
+
+Throws ConcurrentModificationException
+
+Detects concurrent modification
+
+Hashtable → Not Fail-Fast
+
+Uses Enumeration
+
+Does not throw exception
+
+6️⃣ When to Use What?
+Use HashMap when:
+
+Single-threaded environment
+
+Performance matters
+
+Null values are required
+
+Modern applications
+
+Use Hashtable when:
+
+Legacy code
+
+Strict thread safety is needed
+
+No null keys/values allowed
+
+⚠️ Modern alternative: ConcurrentHashMap (Best choice for multithreading)
+
+7️⃣ Interview One-Line Answer
+
+HashMap is faster and not synchronized, allows nulls; Hashtable is synchronized, slower, and does not allow nulls.
+
+8️⃣ Common Interview Questions
+
+❓ Is HashMap thread-safe?
+👉 ❌ No
+
+❓ Why Hashtable is slow?
+👉 Because every method is synchronized
+
+❓ Which is better for multithreading?
+👉 ConcurrentHashMap
+
+
+1️⃣ What is enum in Java?
+Meaning
+
+enum (short for enumeration) is a special data type used to define a fixed set of constants.
+
+👉 Used when values are known, limited, and constant.
+
+Why enum?
+
+Avoids invalid values
+
+Improves code readability
+
+Type-safe (unlike int/string constants)
+
+Example: enum
+enum Day {
+    MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY
+}
+
+public class Test {
+    public static void main(String[] args) {
+        Day d = Day.MONDAY;
+        System.out.println(d);
+    }
+}
+
+
+✔ Output:
+
+MONDAY
+
+Key Points about enum
+
+Internally, enum extends java.lang.Enum
+
+Constants are public static final
+
+Cannot extend other classes
+
+Can have methods, constructors, variables
+
+enum with values
+enum Level {
+    LOW(1), MEDIUM(2), HIGH(3);
+
+    int value;
+    Level(int value) {
+        this.value = value;
+    }
+}
+
+When to use enum? (Interview)
+
+Days, Months
+
+Status (SUCCESS, FAILED, PENDING)
+
+Directions (LEFT, RIGHT)
+
+Fixed configuration values
+
+2️⃣ What is Enumeration in Java?
+Meaning
+
+Enumeration is a legacy interface used to iterate elements of collections like:
+
+Vector
+
+Hashtable
+
+👉 Introduced in Java 1.0
+
+Example: Enumeration
+Vector<Integer> v = new Vector<>();
+v.add(10);
+v.add(20);
+v.add(30);
+
+Enumeration<Integer> e = v.elements();
+
+while (e.hasMoreElements()) {
+    System.out.println(e.nextElement());
+}
+
+
+✔ Output:
+
+10
+20
+30
+
+Important Methods
+boolean hasMoreElements();
+E nextElement();
+
+Limitations of Enumeration
+
+❌ Legacy (outdated)
+❌ Only forward traversal
+❌ No remove operation
+❌ Not fail-fast
+
+3️⃣ enum vs Enumeration (DO NOT CONFUSE ❗)
+Feature	enum	Enumeration
+Type	Keyword / Data type	Interface
+Purpose	Define constants	Traverse collections
+Introduced	Java 5	Java 1.0
+Usage	Values set	Iteration
+Modern usage	✅ Very common	❌ Rare / Legacy
+4️⃣ Enumeration vs Iterator (Interview Add-on)
+Feature	Enumeration	Iterator
+Legacy	✅ Yes	❌ No
+Remove support	❌ No	✅ Yes
+Fail-fast	❌ No	✅ Yes
+Collections	Vector, Hashtable	All collections
+
+👉 Iterator is preferred
+
+5️⃣ One-Line Interview Answers
+
+🔹 enum
+
+A special data type used to represent a fixed set of constants.
+
+🔹 Enumeration
+
+A legacy interface used to iterate elements of old collection classes like Vector and Hashtable.
+
+6️⃣ Very Common Interview Trap
+
+❓ Are enum and Enumeration same?
+👉 ❌ NO
+
+enum → constants
+
+Enumeration → iteration
 -----------------------------------------------------------------------------------------------------------
 
  4. Java collections and why hashing is not included in collections?
@@ -917,6 +1179,255 @@ List → preserves order, allows duplicates.
 Set → no duplicates.
 
 Queue → follows FIFO/LIFO depending on implementation.
+
+What is a Heap?
+
+A heap is a special binary tree (called a Binary Heap) that satisfies:
+
+Complete Binary Tree → all levels are filled except possibly the last (filled from left to right).
+
+Heap Property → defines whether it’s a Min Heap or Max Heap.
+
+🔹 Min Heap
+
+Rule:
+👉 The smallest element is always at the root.
+
+Property:
+For every node i:
+
+parent(i) ≤ leftChild(i)
+parent(i) ≤ rightChild(i)
+
+Example
+
+Tree:
+
+        10
+       /  \
+     20    30
+    /  \
+  40   50
+
+
+Array representation:
+
+[10, 20, 30, 40, 50]
+
+When to use Min Heap?
+
+Get minimum element quickly
+
+Priority Queue (lowest value = highest priority)
+
+Dijkstra’s Algorithm
+
+K smallest elements
+
+🔹 Max Heap
+
+Rule:
+👉 The largest element is always at the root.
+
+Property:
+For every node i:
+
+parent(i) ≥ leftChild(i)
+parent(i) ≥ rightChild(i)
+
+Example
+
+Tree:
+
+        50
+       /  \
+     30    40
+    /  \
+  10   20
+
+
+Array representation:
+
+[50, 30, 40, 10, 20]
+
+When to use Max Heap?
+
+Get maximum element quickly
+
+Top-K largest elements
+
+Heap Sort
+
+Task scheduling
+
+🔹 Array Index Formula (VERY IMPORTANT)
+
+For index i (0-based indexing):
+
+Parent     → (i - 1) / 2
+Left Child → 2*i + 1
+Right Child→ 2*i + 2
+
+🔹 Time Complexity (Interview Favorite)
+Operation	Min Heap	Max Heap
+Insert	O(log n)	O(log n)
+Delete Root	O(log n)	O(log n)
+Peek (min/max)	O(1)	O(1)
+Build Heap	O(n)	O(n)
+🔹 Java Example (Very Simple)
+Min Heap in Java
+PriorityQueue<Integer> minHeap = new PriorityQueue<>();
+
+minHeap.add(10);
+minHeap.add(5);
+minHeap.add(20);
+
+System.out.println(minHeap.peek()); // 5 (smallest)
+
+Max Heap in Java
+PriorityQueue<Integer> maxHeap =
+        new PriorityQueue<>(Collections.reverseOrder());
+
+maxHeap.add(10);
+maxHeap.add(5);
+maxHeap.add(20);
+
+System.out.println(maxHeap.peek()); // 20 (largest)
+
+🔹 Min Heap vs Max Heap (One-Line Difference)
+
+Min Heap: smallest element comes first
+
+Max Heap: largest element comes first
+
+🔹 Interview Tip (Important)
+
+❓ Is Heap a BST?
+❌ NO
+
+Heap only guarantees min/max at root
+
+BST guarantees sorted order
+
+What is ArrayDeque?
+
+ArrayDeque is a resizable array-based implementation of Deque (Double Ended Queue) in Java.
+
+👉 You can insert and remove elements from BOTH ends (front & rear).
+
+It can act as:
+
+Queue
+
+Stack
+
+Deque
+
+Why ArrayDeque?
+
+Java itself recommends:
+
+Use ArrayDeque instead of Stack and LinkedList for stack/queue operations
+
+Reasons:
+
+🚀 Faster than Stack (no synchronization overhead)
+
+🚀 Faster than LinkedList (no node pointers)
+
+❌ No null elements allowed
+
+❌ Not thread-safe
+
+Internal Working (Important)
+
+Uses a circular array
+
+Automatically resizes when full
+
+Maintains head and tail indexes
+
+That’s why insert/delete from both ends is O(1).
+
+Basic Operations
+Create ArrayDeque
+ArrayDeque<Integer> dq = new ArrayDeque<>();
+
+Insert Operations
+dq.addFirst(10);   // front
+dq.addLast(20);    // rear
+dq.offerFirst(5);
+dq.offerLast(25);
+
+
+Now deque looks like:
+
+[5, 10, 20, 25]
+
+Remove Operations
+dq.removeFirst();  // removes 5
+dq.removeLast();   // removes 25
+dq.pollFirst();
+dq.pollLast();
+
+
+Remaining:
+
+[10, 20]
+
+Peek (View without removing)
+dq.peekFirst(); // 10
+dq.peekLast();  // 20
+
+ArrayDeque as a Stack (LIFO)
+ArrayDeque<Integer> stack = new ArrayDeque<>();
+
+stack.push(10);
+stack.push(20);
+stack.push(30);
+
+System.out.println(stack.pop()); // 30
+
+
+✅ Preferred over Stack class
+
+ArrayDeque as a Queue (FIFO)
+ArrayDeque<Integer> queue = new ArrayDeque<>();
+
+queue.offer(10);
+queue.offer(20);
+queue.offer(30);
+
+System.out.println(queue.poll()); // 10
+
+Time Complexity (Interview Must-Know)
+Operation	                Time
+addFirst / addLast	        O(1)
+removeFirst / removeLast	O(1)
+peek	                    O(1)
+search	                    O(n)
+
+
+ArrayDeque vs LinkedList
+Feature	ArrayDeque	LinkedList
+Implementation	Dynamic Array	Doubly Linked List
+Performance	     Faster  Slower
+Memory	         Less	 More
+Null allowed	 ❌ No	 ✅ Yes
+
+👉 Use ArrayDeque whenever possible
+
+Important Interview Points
+
+❌ Cannot store null
+
+❌ Not synchronized
+
+✅ Faster than Stack
+
+✅ Best for stack & queue
+
+Uses circular array
 -----------------------------------------------------------------------------------------------------
  5. What are annotations in Java?
 
