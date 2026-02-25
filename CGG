@@ -1784,4 +1784,1853 @@ CREATE TABLE enrollments (
 
 --------------------------------------------------
 
+🔹 1️⃣ What is Indexing? Why is it used?
+📌 Definition
+
+An index is a database object that improves the speed of data retrieval operations on a table.
+
+Think of it like:
+
+📖 Book without index → You scan every page
+📖 Book with index → You directly go to page number
+
+🧠 Without Index (Full Table Scan)
+SELECT * FROM citizens WHERE aadhar_no = '123456789012';
+
+If 5 crore records → database checks every row ❌
+Time complexity ≈ O(n)
+
+✅ With Index
+CREATE INDEX idx_aadhar ON citizens(aadhar_no);
+
+Now database uses index structure (usually B-Tree).
+
+Time complexity ≈ O(log n) 🔥
+
+🎯 Why Used?
+
+✔ Faster SELECT queries
+✔ Faster WHERE condition search
+✔ Faster JOIN operations
+✔ Faster ORDER BY
+
+------------------------------------------------------------
+🔷 What is an Index in Database?
+
+An index is a data structure (usually B-Tree) that improves data retrieval speed.
+
+Without index → DB scans entire table (Full Table Scan).
+With index → DB directly navigates to required rows.
+
+Time complexity improves from:
+
+O(n) → O(log n)
+
+🔷 1️⃣ Clustered Index (In Detail)
+📌 Definition
+
+A Clustered Index:
+
+Physically sorts and stores the table data according to the indexed column.
+
+This means:
+
+The table itself is stored in sorted order.
+
+Leaf nodes of index contain the actual table data.
+
+📌 Very Important Rule
+
+✔ Only ONE clustered index per table
+
+Why?
+
+Because:
+
+Data can only be physically sorted in one way.
+
+📌 Internal Structure
+
+Clustered index is stored as:
+
+👉 B-Tree
+
+Structure:
+
+Root → Intermediate nodes → Leaf nodes
+
+In clustered index:
+
+Leaf nodes = Actual table rows
+
+So:
+
+Index itself IS the table.
+
+📌 Example
+CREATE CLUSTERED INDEX idx_empid 
+ON employees(emp_id);
+
+Or:
+
+PRIMARY KEY(emp_id)
+
+In most databases (like SQL Server), Primary Key automatically becomes clustered.
+
+📌 What Happens Internally?
+
+If emp_id values:
+
+1, 2, 3, 4, 5
+
+Data is physically stored in that order on disk.
+
+📌 Performance Characteristics
+
+✔ Very fast for:
+
+Range queries
+
+BETWEEN queries
+
+Ordered scans
+
+Example:
+
+SELECT * FROM employees 
+WHERE emp_id BETWEEN 1000 AND 2000;
+
+Since data is sorted physically:
+
+DB reads contiguous pages → very efficient.
+
+📌 Insert Performance Impact
+
+If table is clustered on emp_id:
+
+Inserting new rows in middle:
+
+May cause page splits → slightly slower inserts.
+
+🔷 2️⃣ Non-Clustered Index (In Detail)
+📌 Definition
+
+A Non-Clustered Index:
+
+Does NOT change physical order of table.
+
+Instead:
+
+It creates a separate structure.
+
+Leaf nodes contain pointers to actual data rows.
+
+📌 Internal Structure
+
+Non-clustered index also uses B-Tree.
+
+But:
+
+Leaf nodes contain:
+
+👉 Indexed column value
+👉 Pointer (Row ID or Clustered Key)
+
+Not actual data.
+
+📌 Example
+CREATE INDEX idx_name 
+ON employees(name);
+
+Now:
+
+Table remains physically ordered by emp_id.
+
+But index on name is stored separately.
+
+📌 How It Works Internally
+
+Suppose:
+
+name = 'Ram'
+
+Index stores:
+
+Ram → Pointer → Row location
+
+So DB:
+
+Searches index (fast)
+
+Follows pointer
+
+Fetches actual data row
+
+📌 Performance Characteristics
+
+✔ Very fast for:
+
+Exact search
+
+Lookup by specific value
+
+Example:
+
+SELECT * FROM employees 
+WHERE name = 'Ram';
+
+But:
+
+Range queries less efficient compared to clustered.
+
+🔷 Detailed Comparison
+Feature	Clustered Index	Non-Clustered Index
+Physical order	Yes	No
+Number allowed	One	Multiple
+Leaf nodes	Actual data	Pointers
+Storage	Table itself	Separate
+Range queries	Very fast	Moderate
+Insert speed	Slower (due to sorting)	Faster
+Best for	Primary key, range queries	Search queries
+
+----------------------------------------------------------------
+
+🔷 What is a Composite Index?
+📌 Definition
+
+A Composite Index (also called multi-column index) is:
+
+An index created on two or more columns of a table.
+
+🔹 Syntax
+CREATE INDEX idx_name_city 
+ON citizens(name, city);
+
+This creates an index on:
+
+name
+
+city
+
+The order matters. Very important.
+
+🔷 Why Do We Need Composite Index?
+
+Let’s assume this table:
+
+📌 citizens (50 million rows)
+citizen_id	name	city	age
+1	Ravi	Hyderabad	30
+2	Ravi	Chennai	25
+3	Arun	Hyderabad	40
+4	Kiran	Delhi	28
+🔴 Problem Without Composite Index
+
+Query:
+
+SELECT * 
+FROM citizens
+WHERE name = 'Ravi' 
+AND city = 'Hyderabad';
+
+Without composite index:
+
+DB may scan many rows.
+
+Even if index on name exists,
+DB still needs to check city manually.
+
+🔷 With Composite Index
+CREATE INDEX idx_name_city
+ON citizens(name, city);
+
+Now DB creates a B-Tree sorted like this:
+
+(name, city)
+
+Arun, Hyderabad
+Kiran, Delhi
+Ravi, Chennai
+Ravi, Hyderabad
+
+Now query becomes fast 🔥
+
+Because:
+
+DB can directly navigate tree using:
+
+'name' → 'Ravi'
+Then immediately filter on 'city'
+
+🔷 Very Important Rule: Column Order Matters
+
+This is called:
+
+🔹 Leftmost Prefix Rule
+
+If index is created as:
+
+(name, city)
+
+It works efficiently for:
+
+✔ WHERE name = 'Ravi'
+✔ WHERE name = 'Ravi' AND city = 'Hyderabad'
+
+❌ But NOT Efficient For:
+WHERE city = 'Hyderabad';
+
+Because city is second column.
+
+Index is sorted first by name.
+
+So DB cannot efficiently start search from city.
+
+🔷 Example To Understand Order
+
+If index is:
+
+CREATE INDEX idx_city_name 
+ON citizens(city, name);
+
+Now it works efficiently for:
+
+✔ WHERE city = 'Hyderabad'
+✔ WHERE city = 'Hyderabad' AND name='Ravi'
+
+🔷 Performance Comparison
+
+Without composite index:
+
+O(n) scan
+
+With composite index:
+
+O(log n) search
+
+Huge improvement for large databases.
+
+🔷 Real CGG Example
+
+Citizen portal query:
+
+SELECT citizen_id 
+FROM citizens
+WHERE district = 'Hyderabad'
+AND status = 'Active';
+
+Best composite index:
+
+CREATE INDEX idx_district_status
+ON citizens(district, status);
+🔷 When to Use Composite Index?
+
+✔ Columns frequently used together in WHERE
+✔ Columns used in JOIN + WHERE
+✔ Columns used in filtering + sorting
+
+🔷 Composite Index with ORDER BY
+
+Example:
+
+SELECT * 
+FROM citizens
+WHERE name = 'Ravi'
+ORDER BY city;
+
+Index on:
+
+(name, city)
+
+Helps in both filtering AND sorting.
+
+🔷 What Happens Internally?
+
+Composite index stores:
+
+Column1 → Column2 → Row pointer
+
+Example B-Tree:
+
+Root
+├── Arun
+│ └── Hyderabad
+├── Ravi
+│ ├── Chennai
+│ └── Hyderabad
+└── Kiran
+└── Delhi
+
+🔷 Important Mistake Many Developers Do
+
+Creating separate indexes:
+
+CREATE INDEX idx_name ON citizens(name);
+CREATE INDEX idx_city ON citizens(city);
+
+This is NOT same as composite index.
+
+DB might still scan multiple rows.
+
+Composite index is better when conditions use both columns.
+
+🔷 Advanced Concept: Covering Composite Index
+
+If query:
+
+SELECT name, city 
+FROM citizens
+WHERE name = 'Ravi'
+AND city = 'Hyderabad';
+
+Index:
+
+CREATE INDEX idx_cover
+ON citizens(name, city);
+
+DB may not even touch table.
+
+This is called:
+
+👉 Index Only Scan (Very Fast)
+
+🔷 Interview Question Example
+
+Q: When does composite index not help?
+
+Answer:
+
+If query uses only second column
+
+If order of columns mismatched
+
+If function used on indexed column
+
+Example ❌:
+
+WHERE LOWER(name) = 'ravi'
+
+Index not used.
+
+🔷 Summary Table
+Feature	Composite Index
+Based on	Multiple columns
+Order matters	Yes
+Helps	Multi-condition queries
+Uses	Leftmost prefix rule
+Improves	Search + Join + Sorting
+🎯 Interview Ready Answer
+
+A Composite Index is an index created on multiple columns. It improves performance when queries filter on more than one column. The order of columns is important because of the leftmost prefix rule, meaning the index works efficiently when queries use the first column alone or in combination with subsequent columns, but not efficiently when only later columns are used.
+
+-------------------------------------------------------------------------
+
+🔹 4️⃣ How Does Indexing Improve Performance?
+🔎 Mechanism
+
+Most databases use B-Tree.
+
+Without index:
+
+Full scan
+
+O(n)
+
+With index:
+
+Binary search-like structure
+
+O(log n)
+
+Example:
+
+5 crore records:
+
+Without index → 5 crore comparisons
+With index → maybe 25 comparisons 🔥
+
+Also improves:
+
+✔ JOIN performance
+✔ GROUP BY
+✔ ORDER BY
+✔ Foreign key lookups
+
+🔹 5️⃣ Disadvantages of Indexing
+
+Important question ⚠
+
+❌ 1. Increases Storage
+
+Indexes consume extra disk space.
+
+❌ 2. Slower INSERT / UPDATE / DELETE
+
+Every time row changes → index must update.
+
+Example:
+
+INSERT INTO citizens VALUES(...);
+
+Database must:
+
+Insert row
+
+Update index
+
+❌ 3. Too Many Indexes = Slower System
+
+More indexes = more maintenance overhead.
+
+🎯 CGG Scenario
+
+In land record system:
+
+Too many indexes → slows down bulk updates
+
+Balance is required
+
+------------------------------------------------------------------------------------------
+
+🔷 What is a Covering Index?
+📌 Definition
+
+A Covering Index is:
+
+An index that contains all the columns required to satisfy a query — both in the WHERE clause and in the SELECT clause.
+
+Because of that:
+
+👉 The database does NOT need to access the main table.
+👉 Everything is retrieved directly from the index.
+
+This is called:
+
+🔥 Index Only Scan
+🔷 Why Is It So Fast?
+
+Normally, when you query using an index:
+
+DB searches index → finds matching row pointer.
+
+Then DB goes to main table → fetches remaining columns.
+
+That second step is called:
+
+👉 Table Lookup (or Key Lookup)
+
+Table lookup is expensive (extra disk I/O).
+
+Covering index eliminates this step.
+
+🔷 Example Scenario
+
+Table: citizens (50 million rows)
+
+citizen_id	name	city	aadhar_no	mobile_no
+🔴 Normal Query
+SELECT name, city 
+FROM citizens 
+WHERE aadhar_no = '123';
+🔹 Case 1: Only Index on aadhar_no
+CREATE INDEX idx_aadhar 
+ON citizens(aadhar_no);
+What happens?
+
+Step 1: DB finds aadhar_no in index.
+Step 2: DB fetches row from main table to get name and city.
+
+Two operations required.
+
+🔹 Case 2: Covering Index
+CREATE INDEX idx_cover 
+ON citizens(aadhar_no, name, city);
+
+Now:
+
+The index stores:
+
+aadhar_no | name | city | pointer
+
+When query runs:
+
+SELECT name, city 
+FROM citizens 
+WHERE aadhar_no = '123';
+
+DB finds data directly inside index.
+
+No table lookup required.
+
+Much faster 🚀
+
+🔷 Internal Working (Important Concept)
+
+Non-covering index:
+
+Index → Pointer → Table → Fetch columns
+
+Covering index:
+
+Index → Done
+
+Less disk I/O
+Less memory usage
+Better cache efficiency
+
+🔷 Visual Example
+
+Imagine index as small sorted book.
+
+Without covering index:
+
+You look at index → get page number → open large book → read data.
+
+With covering index:
+
+Everything already written in index book → no need for large book.
+
+🔷 When Does Covering Index Help Most?
+
+✔ Large tables (millions of rows)
+✔ Frequently executed queries
+✔ Read-heavy applications
+✔ API search endpoints
+
+---------------------------------------------------------------
+
+🔹 7️⃣ What is Query Optimization?
+📌 Definition
+
+Query optimization is the process of improving query performance.
+
+Done by:
+
+Rewriting query
+
+Adding indexes
+
+Reducing joins
+
+Removing unnecessary columns
+
+Avoiding subqueries
+
+Example (Bad Query)
+SELECT * FROM employees 
+WHERE YEAR(joining_date) = 2023;
+
+Problem:
+Index cannot be used.
+
+Better:
+
+SELECT * FROM employees
+WHERE joining_date 
+BETWEEN '2023-01-01' AND '2023-12-31';
+
+--------------------------------------------------------------
+
+🔷 What is an Execution Plan?
+📌 Definition
+
+An Execution Plan is:
+
+A step-by-step strategy generated by the database optimizer that shows how the database will execute a SQL query.
+
+It answers:
+
+👉 How will the database retrieve data?
+👉 Which indexes will be used?
+👉 Which tables will be scanned?
+👉 Which join method will be used?
+👉 What is the estimated cost?
+
+🔷 Why Do We Need Execution Plan?
+
+Because:
+
+Query may work correctly
+
+But may be slow
+
+Or scanning millions of rows unnecessarily
+
+Execution plan helps in:
+
+✔ Performance tuning
+✔ Debugging slow queries
+✔ Index optimization
+✔ Understanding join behavior
+
+🔷 How to See Execution Plan?
+🔹 In MySQL
+EXPLAIN SELECT * FROM employees WHERE salary > 50000;
+🔹 In PostgreSQL
+EXPLAIN ANALYZE SELECT * FROM employees WHERE salary > 50000;
+🔷 Example 1: Without Index
+
+Table: employees (10 lakh rows)
+
+SELECT * FROM employees WHERE salary = 60000;
+🔹 Execution Plan (Without Index)
+type: ALL
+rows: 1000000
+key: NULL
+Extra: Using where
+🔎 Meaning:
+
+type = ALL → Full table scan ❌
+
+rows = 1,000,000 → All rows scanned
+
+key = NULL → No index used
+
+Very slow 🚨
+
+🔷 Example 2: With Index
+
+Create index:
+
+CREATE INDEX idx_salary ON employees(salary);
+
+Now run:
+
+EXPLAIN SELECT * FROM employees WHERE salary = 60000;
+🔹 Execution Plan (With Index)
+type: ref
+rows: 10
+key: idx_salary
+Extra: Using index condition
+🔎 Meaning:
+
+type = ref → Index lookup ✔
+
+rows = 10 → Only few rows scanned
+
+key = idx_salary → Index used ✔
+
+Much faster 🔥
+
+🔷 Important Components of Execution Plan
+1️⃣ Type (Access Type)
+
+Shows how rows are accessed.
+
+Type	Meaning	Performance
+system	Single row	Best
+const	Primary key lookup	Very fast
+eq_ref	Unique index join	Excellent
+ref	Non-unique index lookup	Good
+range	Range scan	Good
+index	Full index scan	Moderate
+ALL	Full table scan	Slow ❌
+
+---------------------------------------------------------------------
+
+🔹 9️⃣ How Do You Analyze Slow Queries?
+Step-by-step approach:
+
+1️⃣ Use EXPLAIN
+2️⃣ Check full table scans
+3️⃣ Check missing indexes
+4️⃣ Check join conditions
+5️⃣ Avoid SELECT *
+6️⃣ Check data types
+7️⃣ Check subqueries
+8️⃣ Check network delay
+
+Example:
+EXPLAIN SELECT * 
+FROM citizens 
+WHERE district = 'Hyderabad';
+
+If output shows:
+
+type = ALL
+→ Full table scan ❌
+
+Then add index:
+
+CREATE INDEX idx_district ON citizens(district);
+
+------------------------------------------------------------------------------------
+
+🔹 Normalization & Design
+
+
+
+🔹 1️⃣ What is Normalization?
+📌 Definition
+
+Normalization is the process of organizing data in a database to:
+
+Reduce redundancy
+
+Avoid anomalies
+
+Improve data integrity
+
+Maintain consistency
+
+🎯 Why Important for CGG?
+
+In government systems like:
+
+Land records
+
+Pension systems
+
+Scholarship portals
+
+Citizen databases
+
+Duplicate data can cause:
+
+Wrong benefits
+
+Wrong payments
+
+Legal problems
+
+🧠 Simple Idea
+
+Bad Design ❌
+
+StudentID	Name	Course	Instructor
+1	Ravi	DBMS	Kumar
+1	Ravi	OS	Sharma
+
+Here:
+
+Ravi repeated
+
+Data redundancy
+
+Normalization splits this properly.
+
+🔹 2️⃣ First Normal Form (1NF)
+📌 Rule
+
+1NF says:
+
+No repeating groups
+
+No multi-valued attributes
+
+Each column must contain atomic values
+
+❌ Not in 1NF
+StudentID	Name	Courses
+1	Ravi	DBMS, OS
+
+Courses has multiple values ❌
+
+✅ Convert to 1NF
+StudentID	Name	Course
+1	Ravi	DBMS
+1	Ravi	OS
+
+Now each cell has single value ✔
+
+🔹 3️⃣ Second Normal Form (2NF)
+📌 Rule
+
+Must satisfy:
+1️⃣ Already in 1NF
+2️⃣ No partial dependency
+
+📌 What is Partial Dependency?
+
+When a non-key column depends on part of composite key.
+
+Example
+
+Enrollment table:
+
+StudentID	CourseID	StudentName	CourseName
+
+Primary Key = (StudentID, CourseID)
+
+But:
+
+StudentName depends only on StudentID ❌
+
+CourseName depends only on CourseID ❌
+
+❌ Problem → Partial dependency
+✅ Convert to 2NF
+
+Split into:
+
+Students Table:
+
+| StudentID | StudentName |
+
+Courses Table:
+
+| CourseID | CourseName |
+
+Enrollments Table:
+
+| StudentID | CourseID |
+
+Now no partial dependency ✔
+
+🔹 4️⃣ Third Normal Form (3NF)
+📌 Rule
+
+Must satisfy:
+
+1️⃣ In 2NF
+2️⃣ No transitive dependency
+
+📌 What is Transitive Dependency?
+
+When non-key column depends on another non-key column.
+
+❌ Example
+
+| StudentID | Name | DeptID | DeptName |
+
+Primary Key: StudentID
+
+But:
+
+DeptName depends on DeptID
+
+DeptID depends on StudentID
+
+So DeptName depends indirectly on StudentID ❌
+
+✅ Convert to 3NF
+
+Students:
+
+| StudentID | Name | DeptID |
+
+Departments:
+
+| DeptID | DeptName |
+
+Now transitive dependency removed ✔
+
+🔹 5️⃣ What is BCNF?
+📌 BCNF (Boyce-Codd Normal Form)
+
+Stronger version of 3NF.
+
+Rule:
+
+For every functional dependency A → B,
+A must be a super key.
+
+When BCNF is Needed?
+
+If multiple candidate keys exist.
+
+Example:
+
+| Professor | Subject | Room |
+
+If:
+Professor → Subject
+Subject → Room
+
+There is overlapping dependency → violates BCNF.
+
+Split table appropriately.
+
+🔹 6️⃣ What is Denormalization?
+📌 Definition
+
+Denormalization is combining tables to:
+
+Improve performance
+
+Reduce joins
+
+Speed up read operations
+
+Example
+
+Instead of joining:
+
+Students + Department
+
+We store department name directly in student table.
+
+🎯 When Used?
+
+Data warehouse
+
+Reporting system
+
+Read-heavy systems
+
+⚠ Tradeoff
+
+✔ Faster reads
+❌ More redundancy
+
+🔹 7️⃣ What are Anomalies?
+🔴 1. Insert Anomaly
+
+Cannot insert data without other data.
+
+Example:
+
+Cannot insert new course unless student enrolls.
+
+🔴 2. Update Anomaly
+
+Same data stored multiple times.
+
+If department name changes → update everywhere ❌
+
+🔴 3. Delete Anomaly
+
+Deleting one record removes important info.
+
+If last student leaves course → course info lost ❌
+
+Normalization removes these.
+
+🔹 8️⃣ What is Functional Dependency?
+📌 Definition
+
+If A → B
+Means B depends on A.
+
+Example:
+
+StudentID → StudentName
+
+One student ID gives exactly one name.
+
+🎯 Important for normalization.
+🔹 9️⃣ What is Candidate Key?
+📌 Definition
+
+A candidate key is:
+
+A minimal set of columns that uniquely identify a row.
+
+There can be multiple candidate keys.
+
+Example:
+
+| StudentID | Email | Aadhaar |
+
+Each can uniquely identify student.
+
+All are candidate keys.
+
+🔹 🔟 What is Super Key?
+📌 Definition
+
+Super key is:
+
+Any set of columns that uniquely identify rows.
+
+Includes unnecessary columns.
+
+Example:
+
+StudentID alone → Candidate key
+StudentID + Name → Super key
+
+But not minimal.
+
+🔹 1️⃣1️⃣ What is Surrogate Key?
+📌 Definition
+
+Artificial key created by system.
+
+Example:
+
+AUTO_INCREMENT ID
+
+CREATE TABLE students (
+   id INT AUTO_INCREMENT PRIMARY KEY,
+   name VARCHAR(100)
+);
+Why Used?
+
+✔ Simpler joins
+✔ Stable key
+✔ Better indexing
+
+🔹 1️⃣2️⃣ What is Referential Integrity?
+📌 Definition
+
+Ensures:
+
+Foreign key value must match primary key in parent table.
+
+Example:
+
+Students Table:
+
+| student_id |
+
+Enrollments Table:
+
+| student_id (FK) |
+
+Constraint:
+
+FOREIGN KEY(student_id) REFERENCES students(student_id)
+What Happens?
+
+If student doesn’t exist → cannot insert enrollment ❌
+
+🎯 CGG Example
+
+In government:
+
+Citizen table
+Application table
+
+Application must reference valid citizen.
+
+Referential integrity ensures data validity.
+-------------------------------------------------------------------------------------------------------------------
+
+🔹 Transactions & Concurrency
+
+🔷 1️⃣ What is a Transaction?
+📌 Interview Definition
+
+A transaction is:
+
+A sequence of one or more SQL operations executed as a single logical unit of work, which either fully completes or fully fails.
+
+🔎 Why Do We Need Transactions?
+
+Because real-world operations involve multiple steps.
+
+💳 Example: Bank Money Transfer
+
+Transfer ₹5000 from Account A to Account B:
+
+START TRANSACTION;
+
+UPDATE accounts SET balance = balance - 5000 WHERE acc_id='A';
+UPDATE accounts SET balance = balance + 5000 WHERE acc_id='B';
+
+COMMIT;
+
+If system crashes after first update:
+
+Without transaction → money deducted but not credited ❌
+With transaction → rollback ensures consistency ✔
+
+🔹 Important Commands
+START TRANSACTION;
+COMMIT;
+ROLLBACK;
+🔷 2️⃣ ACID Properties (Very Important for Interview)
+
+Transactions follow ACID principles.
+
+🔹 A — Atomicity (All or Nothing)
+
+If one operation fails → whole transaction fails.
+
+Example:
+
+In bank transfer, if credit step fails → debit should also revert.
+
+Ensured by: ROLLBACK.
+
+🔹 C — Consistency
+
+Database moves from one valid state to another valid state.
+
+Example:
+
+Total money before and after transfer must remain same.
+
+Integrity constraints help ensure consistency:
+
+Primary Key
+
+Foreign Key
+
+Unique
+
+Check constraints
+
+🔹 I — Isolation
+
+Transactions should not interfere with each other.
+
+Example:
+
+Two users booking same train seat at same time.
+
+Isolation ensures only one booking succeeds.
+
+🔹 D — Durability
+
+Once committed, changes are permanently saved.
+
+Even if:
+
+Power failure
+
+System crash
+
+Handled using:
+
+Write-ahead logs
+
+Redo logs
+
+Database recovery mechanisms
+
+🔷 3️⃣ What is Concurrency?
+
+Concurrency means:
+
+Multiple transactions executing at the same time.
+
+Example:
+
+1000 users applying for scholarship simultaneously.
+
+Database must handle:
+
+✔ Accuracy
+✔ Performance
+✔ Data integrity
+
+-------------------------------------------------------------------
+
+🔷 What is Isolation Level?
+📌 Definition
+
+Isolation level defines:
+
+How much one transaction is allowed to see the uncommitted changes of another transaction.
+
+It controls:
+
+Data visibility
+
+Concurrency behavior
+
+Locking behavior
+
+Consistency vs performance tradeoff
+
+🔥 Why Isolation Is Needed?
+
+Imagine:
+
+Citizen A paying property tax
+Citizen B viewing tax status
+
+If payment is in progress and not completed,
+Should B see it or not?
+
+Isolation level decides that.
+
+🧠 Example Scenario
+
+Two transactions running:
+
+Transaction 1 (T1)
+BEGIN;
+UPDATE accounts SET balance = balance - 1000 WHERE id = 1;
+
+Not committed yet ❌
+
+Transaction 2 (T2)
+SELECT balance FROM accounts WHERE id = 1;
+
+Should T2 see deducted balance or old balance?
+
+Isolation level controls this.
+
+🔷 Types of Isolation Levels
+
+There are 4 standard isolation levels (SQL standard).
+
+1️⃣ Read Uncommitted (Lowest Isolation)
+📌 Rule
+
+Can read data even if not committed.
+
+❗ Problem: Dirty Read
+
+T1 updates salary but doesn't commit.
+T2 reads that value.
+
+If T1 rolls back → T2 read wrong data.
+
+Dirty Read Example
+
+T1:
+
+UPDATE employees SET salary = 100000 WHERE id = 1;
+
+(Not committed)
+
+T2:
+
+SELECT salary FROM employees WHERE id = 1;
+
+Sees 100000 ❌
+
+T1:
+
+ROLLBACK;
+
+Now salary back to old value.
+
+T2 read incorrect data ❌
+
+🟡 Performance: Fast
+🔴 Risk: High
+
+Not suitable for banking/government.
+
+2️⃣ Read Committed (Default in many DBs)
+📌 Rule
+
+Can only read committed data.
+
+Prevents dirty reads.
+
+Behavior
+
+If T1 not committed → T2 cannot see that change.
+
+🔴 Problem: Non-Repeatable Read
+
+T2 reads value twice and gets different results.
+
+Example:
+
+T2:
+
+SELECT salary FROM employees WHERE id = 1;
+
+Gets 50000.
+
+T1 updates and commits:
+
+UPDATE employees SET salary = 60000 WHERE id = 1;
+COMMIT;
+
+T2 reads again → 60000.
+
+Value changed during transaction ❌
+
+🟢 Safe for most systems
+🟡 Medium performance
+3️⃣ Repeatable Read
+📌 Rule
+
+If a transaction reads data,
+no other transaction can modify it until current transaction ends.
+
+Prevents:
+
+✔ Dirty read
+✔ Non-repeatable read
+
+🔴 But allows Phantom Read
+What is Phantom Read?
+
+T2 reads all rows where salary > 50000.
+
+Meanwhile T1 inserts a new employee with salary 70000 and commits.
+
+If T2 runs query again → new row appears.
+
+That new row is phantom row.
+
+🟢 Very safe
+🟡 More locking
+🟡 Slightly slower
+
+Used in financial systems.
+
+4️⃣ Serializable (Highest Isolation)
+📌 Rule
+
+Transactions behave as if running one after another (no overlap).
+
+Prevents:
+
+✔ Dirty reads
+✔ Non-repeatable reads
+✔ Phantom reads
+
+But:
+
+🔴 Very slow
+🔴 Heavy locking
+🔴 Can reduce concurrency
+
+------------------------------------------------------------------------
+🔷 6️⃣ What is Dirty Read?
+
+Dirty read occurs when:
+
+A transaction reads uncommitted data from another transaction.
+
+🔎 Example
+
+Transaction T1:
+
+START TRANSACTION;
+UPDATE accounts SET balance=9000 WHERE acc_id='A';
+-- not committed yet
+
+Transaction T2:
+
+SELECT balance FROM accounts WHERE acc_id='A';
+-- Reads 9000
+
+Then T1 rolls back.
+
+Now balance was never actually 9000.
+
+T2 read wrong data ❌
+
+This is Dirty Read.
+
+Prevented by: Read Committed isolation.
+
+------------------------------------------------
+
+🔷 What is Non-Repeatable Read?
+📌 Definition
+
+A Non-Repeatable Read occurs when:
+
+A transaction reads the same row twice and gets different values because another transaction modified and committed that row in between.
+
+So the data is not repeatable inside the same transaction.
+
+🧠 Why It Happens?
+
+It happens when:
+
+Isolation level is Read Committed
+
+Database allows other transactions to modify rows
+
+First transaction does not lock the row for full duration
+
+🔥 Step-by-Step Example
+
+Assume accounts table:
+
+acc_id	balance
+A	10000
+👤 Transaction 1 (T1)
+START TRANSACTION;
+SELECT balance FROM accounts WHERE acc_id='A';
+
+Output:
+
+10000
+
+T1 expects this value to remain same inside transaction.
+
+👤 Transaction 2 (T2)
+UPDATE accounts SET balance=12000 WHERE acc_id='A';
+COMMIT;
+
+Now balance updated permanently to 12000.
+
+👤 Transaction 1 (T1 again)
+SELECT balance FROM accounts WHERE acc_id='A';
+
+Output:
+
+12000
+
+⚠ Value changed inside same transaction.
+
+This is Non-Repeatable Read.
+
+📊 Visualization
+T1: Reads balance → 10000
+T2: Updates balance → 12000 (committed)
+T1: Reads again → 12000 ❌
+
+The row changed while T1 was still running.
+
+🔴 Why Is This Dangerous?
+
+In financial systems:
+
+Example:
+T1 calculates tax or interest based on first read.
+If value changes mid-transaction → wrong calculation.
+
+Example in CGG:
+
+Officer verifying land payment:
+
+First read: Payment pending
+
+Second read: Payment completed
+
+Result inconsistency
+
+Could cause incorrect approvals.
+
+-------------------------------------------------------------
+
+🔷 What is Phantom Read?
+📌 Definition
+
+A Phantom Read occurs when:
+
+A transaction re-executes a query and finds additional rows (or missing rows) because another transaction inserted or deleted rows and committed them in between.
+
+So the row set changes, not just column values.
+
+🧠 Simple Meaning
+
+Non-Repeatable Read → Same row, value changed
+
+Phantom Read → New rows appeared (or disappeared)
+
+🔥 Example in Detail
+
+Assume employees table:
+
+emp_id	name	salary
+1	Arun	55000
+2	Sita	70000
+3	John	40000
+4	Meena	65000
+5	Raj	52000
+👤 Transaction 1 (T1)
+START TRANSACTION;
+SELECT * FROM employees WHERE salary > 50000;
+
+Result:
+
+emp_id	name	salary
+1	Arun	55000
+2	Sita	70000
+4	Meena	65000
+5	Raj	52000
+
+👉 Suppose 4 rows returned.
+
+T1 assumes this is the full result set.
+
+👤 Transaction 2 (T2)
+INSERT INTO employees VALUES (6,'Ravi',60000);
+COMMIT;
+
+Now Ravi qualifies for salary > 50000.
+
+👤 Transaction 1 (T1 again)
+SELECT * FROM employees WHERE salary > 50000;
+
+Result:
+
+Now 5 rows appear.
+New row (Ravi) appeared.
+
+⚠ A new “phantom” row appeared inside same transaction.
+
+That is Phantom Read.
+
+📊 Visual Timeline
+T1 → Read rows (4 rows)
+
+T2 → Insert new matching row → COMMIT
+
+T1 → Reads again → Now 5 rows ❌
+
+Row set changed.
+
+🔷 Why Does Phantom Read Occur?
+
+Because:
+
+Isolation level is Read Committed or Repeatable Read
+
+Database locks existing rows
+
+But does not lock the range of rows matching the condition
+
+So new rows can enter the result set.
+---------------------------------------------------------------------------------
+
+🔷 9️⃣ What is Locking?
+📌 Definition
+
+Locking is a mechanism used by the database to:
+
+Control concurrent access to data so that multiple transactions do not corrupt or modify the same data simultaneously.
+
+It ensures:
+
+Data consistency
+
+Isolation (ACID property)
+
+Prevention of dirty reads
+
+Prevention of lost updates
+
+🔥 Why Locking Is Needed?
+
+Imagine:
+
+Two officers updating same land record:
+
+T1:
+
+UPDATE land SET owner='Ravi' WHERE plot_id=101;
+
+T2:
+
+UPDATE land SET owner='Sita' WHERE plot_id=101;
+
+If both execute at same time without locking:
+
+Final owner may be unpredictable ❌
+This is called Lost Update problem.
+
+Locking prevents this.
+
+🔷 Types of Locks
+1️⃣ Shared Lock (S Lock)
+📌 Purpose
+
+Used for reading data.
+
+🔹 Characteristics
+
+✔ Multiple transactions can acquire shared lock on same data
+❌ Cannot modify while shared lock exists
+
+🧠 Example
+
+T1:
+
+SELECT * FROM accounts WHERE acc_id='A';
+
+Database applies Shared Lock on that row.
+
+T2:
+
+SELECT * FROM accounts WHERE acc_id='A';
+
+Allowed ✔ (multiple reads allowed)
+
+But:
+
+T3:
+
+UPDATE accounts SET balance=20000 WHERE acc_id='A';
+
+Blocked ❌ until S lock released.
+
+🔷 Use Case
+
+Government portal:
+Many users viewing same property record.
+
+Reading allowed concurrently.
+
+2️⃣ Exclusive Lock (X Lock)
+📌 Purpose
+
+Used for modifying data (INSERT, UPDATE, DELETE).
+
+🔹 Characteristics
+
+✔ Only one transaction allowed
+❌ No other read or write allowed
+
+🧠 Example
+
+T1:
+
+UPDATE accounts SET balance=15000 WHERE acc_id='A';
+
+X Lock applied.
+
+Now:
+
+T2:
+
+SELECT balance FROM accounts WHERE acc_id='A';
+
+Blocked ❌
+
+T3:
+
+UPDATE accounts SET balance=18000 WHERE acc_id='A';
+
+Blocked ❌
+
+Only T1 can proceed.
+
+🔷 Important Rule
+
+X Lock is stronger than S Lock.
+
+Compatibility:
+
+Lock Type	Shared	Exclusive
+Shared	✔ Allowed	❌ Not allowed
+Exclusive	❌ Not allowed	❌ Not allowed
+🔷 Lock Granularity
+
+Granularity means:
+
+How much data is locked.
+
+Finer granularity → Better concurrency.
+
+1️⃣ Row-Level Lock
+
+Locks only specific row.
+
+Best for high concurrency.
+
+Example
+UPDATE employees SET salary=70000 WHERE emp_id=10;
+
+Only row with emp_id=10 locked.
+
+Other rows free.
+
+✔ More concurrent access
+✔ Better performance
+
+Used in OLTP systems like CGG.
+
+2️⃣ Page-Level Lock
+
+Locks a page (group of rows stored together).
+
+Less concurrency.
+
+If 100 rows in page:
+Updating 1 row locks all 100 rows.
+
+Used sometimes internally by database.
+
+3️⃣ Table-Level Lock
+
+Locks entire table.
+
+Example
+LOCK TABLE employees WRITE;
+
+Now:
+
+❌ No one can read or write
+until lock released.
+
+Used rarely in high-concurrency systems.
+
+🔷 Granularity Comparison
+Lock Level	Concurrency	Performance
+Row-Level	High	Best
+Page-Level	Medium	Moderate
+Table-Level	Low	Low (heavy lock)
+🔷 How Locking Works Internally
+
+Most databases follow:
+
+Two-Phase Locking (2PL):
+
+1️⃣ Growing Phase → Acquire locks
+2️⃣ Shrinking Phase → Release locks
+
+Ensures serializable behavior.
+
+---------------------------------------------------------------------
+
+🔷 🔟 What is Deadlock?
+📌 Definition
+
+A Deadlock occurs when:
+
+Two or more transactions are waiting for each other to release locks, and none of them can proceed.
+
+It creates a circular wait condition.
+
+🔥 Basic Example
+
+Assume table accounts
+
+👤 Transaction 1 (T1)
+UPDATE accounts SET balance = balance - 1000 WHERE acc_id = 'A';
+
+Locks Row A (Exclusive Lock)
+
+Now wants to update Row B:
+
+UPDATE accounts SET balance = balance + 1000 WHERE acc_id = 'B';
+
+But Row B is locked by T2.
+
+👤 Transaction 2 (T2)
+UPDATE accounts SET balance = balance - 500 WHERE acc_id = 'B';
+
+Locks Row B.
+
+Now wants Row A:
+
+UPDATE accounts SET balance = balance + 500 WHERE acc_id = 'A';
+
+But Row A is locked by T1.
+
+📊 Deadlock Situation
+T1 holds Row A → waiting for Row B
+T2 holds Row B → waiting for Row A
+
+Neither can proceed ❌
+Both waiting forever.
+
+That is Deadlock.
+
+🔷 Why Deadlock Happens?
+
+Deadlock happens when these four conditions occur together:
+
+1️⃣ Mutual Exclusion (resource cannot be shared)
+2️⃣ Hold and Wait (transaction holds one lock and waits for another)
+3️⃣ No Preemption (locks cannot be forcibly taken)
+4️⃣ Circular Wait (cycle exists)
+
+If all 4 are present → Deadlock possible.
+
+🔷 Real CGG Scenario
+
+Imagine:
+
+Officer 1:
+Updating land record in District A and then District B.
+
+Officer 2:
+Updating District B and then District A.
+
+If order not consistent → Deadlock.
+--------------------------------------------------------------------------
+
+
+
+
+
+
 
