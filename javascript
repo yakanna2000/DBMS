@@ -3910,4 +3910,581 @@ Answer:
 A Promise is a JavaScript object used to handle asynchronous operations. It represents a value that may be available now, later, or never, and allows handling success using then() and errors using catch().
 
 ---------------------------------------------------------------------------------------------------------------
+1. What is Debouncing?
+Definition (Interview Answer)
 
+Debouncing ensures that a function is executed only after a certain delay has passed since the last time it was called.
+
+In simple words:
+
+If multiple events happen quickly, the function runs only once after the user stops triggering the event.
+
+Example Scenario
+
+Search box suggestions.
+
+When a user types:
+
+H
+He
+Hel
+Hell
+Hello
+
+Without debouncing → API is called 5 times
+
+With debouncing → API is called only once
+
+Debouncing Visualization
+
+User typing:
+
+|H|He|Hel|Hell|Hello|
+
+Debounce delay
+
+--------------execute--------------
+
+Function executes after typing stops.
+
+2. Debouncing Example
+
+Example: Search input.
+
+function debounce(fn, delay){
+
+  let timer;
+
+  return function(...args){
+
+    clearTimeout(timer);
+
+    timer = setTimeout(()=>{
+      fn.apply(this,args);
+    },delay);
+
+  }
+
+}
+
+Usage
+
+function search(query){
+  console.log("Searching:", query);
+}
+
+const debounceSearch = debounce(search, 500);
+
+debounceSearch("H");
+debounceSearch("He");
+debounceSearch("Hel");
+
+Output
+
+Searching: Hel
+
+Only last call runs.
+
+3. Real-world Uses of Debouncing
+
+Debouncing is used in:
+
+Search Input
+Google search suggestions
+Window Resize
+window.resize event
+Form Validation
+Validate after user stops typing
+4. What is Throttling?
+Definition (Interview Answer)
+
+Throttling ensures a function executes at most once within a specified time interval.
+
+Even if an event happens multiple times, the function runs only once every fixed time period.
+
+Example Scenario
+
+Scrolling a webpage.
+
+Without throttling
+
+scroll event fires 100+ times
+
+With throttling
+
+scroll event fires once every 200ms
+Throttling Visualization
+
+Events
+
+|||||||||||||||||||||
+
+Execution
+
+|----|----|----|----|
+
+Function runs at regular intervals.
+
+5. Throttling Example
+function throttle(fn, delay){
+
+  let lastCall = 0;
+
+  return function(...args){
+
+    const now = new Date().getTime();
+
+    if(now - lastCall < delay){
+      return;
+    }
+
+    lastCall = now;
+
+    fn.apply(this,args);
+
+  }
+
+}
+
+Usage
+
+function logScroll(){
+  console.log("Scroll event triggered");
+}
+
+const throttledScroll = throttle(logScroll,1000);
+
+window.addEventListener("scroll", throttledScroll);
+6. Real-world Uses of Throttling
+
+Throttling is used in:
+
+Scroll events
+window scrolling
+Resize events
+window resizing
+Button clicks
+Prevent multiple submissions
+7. Debounce Interview Question
+
+(Button Press Debounce)
+
+Problem
+
+User clicks button multiple times quickly.
+
+We want function to run only once after delay.
+
+Example
+
+const debounceClick = debounce(()=>{
+  console.log("Button clicked");
+},1000);
+
+Clicking
+
+click click click click
+
+Output
+
+Button clicked
+
+(after delay)
+
+8. Throttle Interview Question
+
+(Button Press Throttle)
+
+Throttle example
+
+const throttleClick = throttle(()=>{
+  console.log("Button clicked");
+},1000);
+
+Clicks
+
+click click click click
+
+Output
+
+Button clicked
+Button clicked
+Button clicked
+
+Each 1 second interval.
+
+9. Debounce Polyfill Implementation
+
+Interviewers often ask:
+
+Write a debounce function
+
+Solution
+
+function debounce(func, delay){
+
+  let timer;
+
+  return function(...args){
+
+    clearTimeout(timer);
+
+    timer = setTimeout(()=>{
+      func.apply(this,args);
+    },delay);
+
+  };
+
+}
+
+Explanation
+
+timer stores timeout
+clearTimeout removes previous calls
+setTimeout executes latest call
+10. Throttle Polyfill Implementation
+
+Interview question:
+
+Implement throttle()
+
+Solution
+
+function throttle(func, delay){
+
+  let lastTime = 0;
+
+  return function(...args){
+
+    let now = Date.now();
+
+    if(now - lastTime >= delay){
+
+      lastTime = now;
+
+      func.apply(this,args);
+
+    }
+
+  }
+
+}
+
+Explanation
+
+lastTime stores last execution time
+function runs only if delay passed
+11. Difference Between Debounce and Throttle
+Feature	Debounce	Throttle
+Execution	After delay stops	At fixed interval
+Use case	Search typing	Scroll events
+API calls	Reduced heavily	Controlled
+Function run	Once after inactivity	Multiple times at interval
+12. Visual Difference
+
+Debounce
+
+Events:  ||||||||||||
+Run:     ---------|
+
+Throttle
+
+Events:  ||||||||||||
+Run:     |----|----|----|
+13. Interview Tip
+
+When interviewer asks:
+
+"Debounce vs Throttle?"
+
+Best answer:
+
+Debouncing delays execution until the user stops triggering the event, while throttling ensures the function executes at most once within a specified time interval.
+---------------------------------------------------------------------------------------------------------------------
+1. What is Event Propagation?
+Definition (Interview Answer)
+
+Event propagation is the process that determines how an event travels through the DOM tree when an event occurs.
+
+When a user triggers an event (like a click), it goes through three phases.
+
+Event propagation phases:
+
+1. Capturing Phase
+2. Target Phase
+3. Bubbling Phase
+Example DOM
+<div id="grandparent">
+  <div id="parent">
+    <button id="child">Click Me</button>
+  </div>
+</div>
+
+If the button is clicked, the event travels through this structure.
+
+2. What is Event Bubbling?
+Definition
+
+Event Bubbling means the event starts from the target element and bubbles upwards to its parent elements.
+
+Flow:
+
+child → parent → grandparent → document
+Example
+document.getElementById("grandparent")
+.addEventListener("click", ()=>{
+  console.log("Grandparent clicked");
+});
+
+document.getElementById("parent")
+.addEventListener("click", ()=>{
+  console.log("Parent clicked");
+});
+
+document.getElementById("child")
+.addEventListener("click", ()=>{
+  console.log("Child clicked");
+});
+
+When clicking child button
+
+Output
+
+Child clicked
+Parent clicked
+Grandparent clicked
+
+Because event bubbles upward.
+
+3. event.target vs this vs event.currentTarget
+
+This is a very common interview question.
+
+event.target
+
+event.target refers to the element that actually triggered the event.
+
+event.currentTarget
+
+event.currentTarget refers to the element on which the event listener is attached.
+
+this
+
+Inside an event handler:
+
+this === event.currentTarget
+Example
+<div id="parent">
+   <button id="child">Click</button>
+</div>
+document.getElementById("parent")
+.addEventListener("click", function(event){
+
+  console.log("target:", event.target);
+  console.log("currentTarget:", event.currentTarget);
+  console.log("this:", this);
+
+});
+
+Clicking the button
+
+Result
+
+target → button
+currentTarget → div
+this → div
+4. What is Event Capturing (Trickling)?
+Definition
+
+Event Capturing is the opposite of bubbling.
+
+The event travels from the root element down to the target element.
+
+Flow
+
+document → grandparent → parent → child
+Example
+document.getElementById("grandparent")
+.addEventListener("click", ()=>{
+  console.log("Grandparent clicked");
+}, true);
+
+The true enables capturing mode.
+
+Example with full DOM
+
+grandparent.addEventListener("click",()=>console.log("grandparent"),true)
+parent.addEventListener("click",()=>console.log("parent"),true)
+child.addEventListener("click",()=>console.log("child"),true)
+
+Clicking child
+
+Output
+
+grandparent
+parent
+child
+5. How to Stop Bubbling or Capturing
+
+Sometimes we want to prevent the event from propagating further.
+
+We use:
+
+event.stopPropagation()
+Example
+document.getElementById("child")
+.addEventListener("click",(event)=>{
+
+  console.log("Child clicked");
+
+  event.stopPropagation();
+
+});
+
+Now clicking child prints
+
+Child clicked
+
+Parent and grandparent will not run.
+
+6. What is Event Delegation?
+Definition (Interview Answer)
+
+Event delegation is a technique where we attach a single event listener to a parent element to handle events for multiple child elements.
+
+This works because of event bubbling.
+
+Why Event Delegation is Used
+
+Benefits:
+
+Better performance
+Less memory usage
+Works for dynamically added elements
+Example
+
+HTML
+
+<ul id="products">
+  <li id="laptop">Laptop</li>
+  <li id="phone">Phone</li>
+  <li id="tablet">Tablet</li>
+</ul>
+
+JavaScript
+
+document.getElementById("products")
+.addEventListener("click",(event)=>{
+
+  console.log("Clicked item:",event.target.id);
+
+});
+
+Clicking Phone
+
+Output
+
+Clicked item: phone
+
+We added only one event listener.
+
+7. Output Based Question
+
+Example
+
+<div id="parent">
+   <button id="child">Click</button>
+</div>
+document.getElementById("parent")
+.addEventListener("click",()=>{
+   console.log("Parent");
+});
+
+document.getElementById("child")
+.addEventListener("click",()=>{
+   console.log("Child");
+});
+
+Click button.
+
+Output
+
+Child
+Parent
+
+Because bubbling occurs.
+
+8. Modal Example (Common Interview Question)
+
+Create a modal popup that closes when clicking outside.
+
+HTML
+<div id="modal">
+  <div id="content">
+      Modal Content
+  </div>
+</div>
+JavaScript
+document.getElementById("modal")
+.addEventListener("click",()=>{
+   console.log("Modal closed");
+});
+
+document.getElementById("content")
+.addEventListener("click",(event)=>{
+   event.stopPropagation();
+});
+
+Explanation
+
+click modal → close modal
+click content → stopPropagation → modal stays open
+9. Event Propagation Flow
+
+Complete flow:
+
+1. Capturing Phase
+2. Target Phase
+3. Bubbling Phase
+
+Visualization
+
+document
+  ↓
+html
+  ↓
+body
+  ↓
+div
+  ↓
+button (target)
+  ↑
+div
+  ↑
+body
+  ↑
+html
+10. Very Common Interview Questions
+
+Interviewers often ask:
+
+Q1 What is Event Propagation?
+Process of event traveling through DOM
+Q2 What is Event Bubbling?
+Event moves from target → parent
+Q3 What is Event Capturing?
+Event moves from root → target
+Q4 Difference between event.target and currentTarget
+target → actual clicked element
+currentTarget → element with event listener
+Q5 What is Event Delegation?
+Handling events using parent element
+Final Interview Answer
+
+If interviewer asks:
+
+“What is Event Delegation?”
+
+Best answer:
+
+Event delegation is a technique where a single event listener is attached to a parent element to handle events of its child elements using event bubbling.
