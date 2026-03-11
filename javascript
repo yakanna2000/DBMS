@@ -2110,8 +2110,1804 @@ Answer like this:
 
 Currying is a functional programming technique where a function that takes multiple arguments is transformed into a sequence of functions each taking a single argument. It works using closures and helps in code reuse, function composition, and creating reusable utility functions.
 
------------------------------------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------------------------------
+
+1. What are Objects in JavaScript?
+Definition (Interview Answer)
+
+An object in JavaScript is a collection of key–value pairs used to store related data and functionality.
+
+Example
+
+let user = {
+  name: "Roadside Coder",
+  age: 24
+};
+
+Here:
+
+name → key
+"Roadside Coder" → value
+
+Object structure
+
+{
+  key: value,
+  key: value
+}
+2. Creating an Object
+
+Objects are created using curly braces {}
+
+Example
+
+let user = {
+  name: "Piyush",
+  age: 24
+};
+3. Accessing Object Properties
+
+There are two ways.
+
+1. Dot Notation
+console.log(user.name);
+
+Output
+
+Piyush
+2. Bracket Notation
+console.log(user["name"]);
+
+Output
+
+Piyush
+
+Bracket notation is useful when:
+
+key has spaces
+
+key is dynamic
+
+4. Modifying Object Properties
+
+Example
+
+user.name = "Alex";
+
+console.log(user.name);
+
+Output
+
+Alex
+5. Deleting Object Properties
+delete user.age;
+
+Object becomes
+
+{ name: "Alex" }
+6. Output Interview Question
+Question
+const func = (function(a){
+  delete a;
+  return a;
+})(5);
+
+console.log(func);
+
+Output
+
+5
+Explanation
+
+delete works only on object properties, not variables.
+
+delete a → has no effect
+
+So a remains 5.
+
+7. Multiword Keys
+
+Example
+
+let user = {
+  "like the video": true
+};
+
+Access
+
+console.log(user["like the video"]);
+
+Output
+
+true
+
+Dot notation cannot be used.
+
+8. Computed Properties
+
+Computed properties allow dynamic keys.
+
+Example
+
+let property = "firstName";
+let name = "Piyush";
+
+let person = {
+  [property]: name
+};
+
+console.log(person.firstName);
+
+Output
+
+Piyush
+
+Here
+
+[property]
+
+means
+
+["firstName"]
+9. Looping Through Objects
+
+Use for...in loop
+
+Example
+
+let user = {
+  name: "Piyush",
+  age: 24
+};
+
+for (let key in user) {
+  console.log(key);
+  console.log(user[key]);
+}
+
+Output
+
+name
+Piyush
+age
+24
+10. Output Question
+const obj = {
+  a: "one",
+  b: "two",
+  a: "three"
+};
+
+console.log(obj);
+
+Output
+
+{ a: "three", b: "two" }
+
+Explanation
+
+Object keys must be unique.
+
+Last value overrides previous one.
+
+11. Multiply Numeric Properties
+
+Question
+
+let nums = {
+  a: 100,
+  b: 200,
+  title: "My nums"
+};
+
+Expected
+
+{ a: 200, b: 400, title: "My nums" }
+
+Solution
+
+function multiplyByTwo(obj){
+
+  for(let key in obj){
+
+    if(typeof obj[key] === "number"){
+      obj[key] *= 2;
+    }
+
+  }
+
+}
+12. Tricky Object Key Question
+Question
+const a = {};
+const b = {key:"b"};
+const c = {key:"c"};
+
+a[b] = 123;
+a[c] = 456;
+
+console.log(a[b]);
+
+Output
+
+456
+Explanation
+
+Object keys are converted to strings.
+
+b → "[object Object]"
+c → "[object Object]"
+
+So:
+
+a["[object Object]"] = 456
+13. JSON.stringify() and JSON.parse()
+JSON.stringify()
+
+Converts object → JSON string
+
+Example
+
+let obj = {name:"Alex"};
+
+console.log(JSON.stringify(obj));
+
+Output
+
+'{"name":"Alex"}'
+JSON.parse()
+
+Converts JSON string → object
+
+Example
+
+let str = '{"name":"Alex"}';
+
+console.log(JSON.parse(str));
+
+Output
+
+{ name: "Alex" }
+14. Spread Operator with Strings
+
+Example
+
+[..."Lydia"]
+
+Output
+
+["L","y","d","i","a"]
+15. Spread Operator with Objects
+const user = { name: "Lydia", age: 21 };
+
+const admin = {
+  admin: true,
+  ...user
+};
+
+console.log(admin);
+
+Output
+
+{ admin:true, name:"Lydia", age:21 }
+16. JSON.stringify Replacer Example
+const settings = {
+ username:"lydiahallie",
+ level:19,
+ health:90
+};
+
+const data = JSON.stringify(settings,["level","health"]);
+
+console.log(data);
+
+Output
+
+{"level":19,"health":90}
+
+Because replacer array filters properties.
+
+17. Arrow Function vs Regular Function in Objects
+
+Example
+
+const shape = {
+
+ radius:10,
+
+ diameter(){
+   return this.radius * 2;
+ },
+
+ perimeter: () => 2 * Math.PI * this.radius
+
+};
+
+console.log(shape.diameter());
+console.log(shape.perimeter());
+
+Output
+
+20
+NaN
+Why?
+
+Arrow functions do not bind this.
+
+18. Object Destructuring
+
+Extract values from object.
+
+Example
+
+let user = {
+ name:"Piyush",
+ age:24
+};
+
+const {name} = user;
+
+console.log(name);
+
+Output
+
+Piyush
+19. Renaming in Destructuring
+
+Example
+
+const { name: myName } = { name:"Lydia" };
+
+console.log(myName);
+
+Output
+
+Lydia
+20. Referencing in Objects
+
+Example
+
+let c = { greeting:"Hey!" };
+let d;
+
+d = c;
+
+c.greeting = "Hello";
+
+console.log(d.greeting);
+
+Output
+
+Hello
+
+Objects are stored by reference.
+
+21. Object Comparison
+console.log({a:1} == {a:1});
+console.log({a:1} === {a:1});
+
+Output
+
+false
+false
+
+Because objects compare references, not values.
+
+22. Reference Example
+let person = { name:"Lydia" };
+
+const members = [person];
+
+person = null;
+
+console.log(members);
+
+Output
+
+[{ name:"Lydia" }]
+
+Because array holds reference copy.
+
+23. Default Parameter Object Example
+const value = { number:10 };
+
+const multiply = (x = {...value}) => {
+  console.log(x.number *= 2);
+};
+
+multiply();
+multiply();
+multiply(value);
+multiply(value);
+
+Output
+
+20
+20
+20
+40
+
+Because default parameter creates new object each time.
+
+24. Function Changing Object
+function changeAgeAndReference(person){
+
+  person.age = 25;
+
+  person = {
+    name:"John",
+    age:50
+  };
+
+  return person;
+
+}
+
+const personObj1 = {
+ name:"Alex",
+ age:30
+};
+
+const personObj2 = changeAgeAndReference(personObj1);
+
+Output
+
+personObj1 → { name:"Alex", age:25 }
+personObj2 → { name:"John", age:50 }
+25. Shallow Copy
+
+Example
+
+const user = { name:"Jen", age:26 };
+
+const copy = user;
+
+copy.age = 24;
+
+console.log(user);
+
+Output
+
+{ name:"Jen", age:24 }
+
+Because same reference.
+
+26. Deep Copy
+
+Example
+
+const user = { name:"Jen", age:26 };
+
+const copy = JSON.parse(JSON.stringify(user));
+
+copy.age = 24;
+
+console.log(user);
+
+Output
+
+{ name:"Jen", age:26 }
+
+Objects are independent.
+
+27. Ways to Clone Object
+Method 1
+Object.assign({},obj)
+Method 2
+{...obj}
+Method 3
+JSON.parse(JSON.stringify(obj))
+Method 4
+structuredClone(obj)
+
+-----------------------------------------------------------------------------------------------------------
+
+1. What is this in JavaScript?
+Definition (Interview Answer)
+
+this is a special keyword that refers to the object that is currently executing the function.
+
+Important rule:
+
+The value of this depends on how a function is called, not where it is defined.
+
+This is called runtime binding.
+
+2. Types of this Binding
+
+There are mainly two types mentioned in interviews.
+
+1. Implicit Binding
+
+Implicit binding happens when a function is called using an object.
+
+Example
+
+const user = {
+  name: "Piyush",
+  getName() {
+    console.log(this.name);
+  }
+};
+
+user.getName();
+
+Output
+
+Piyush
+
+Here
+
+this → user object
+
+Because the function is called using
+
+user.getName()
+2. Explicit Binding
+
+Explicit binding allows us to manually set this.
+
+It is done using:
+
+call()
+apply()
+bind()
+
+Example
+
+function greet() {
+  console.log(this.name);
+}
+
+const user = { name: "Piyush" };
+
+greet.call(user);
+
+Output
+
+Piyush
+3. this in Global Scope
+
+Example
+
+console.log(this);
+
+In browser:
+
+window object
+
+Example
+
+let a = 5;
+console.log(this.a);
+
+Output
+
+undefined
+
+Because let variables are not attached to window object.
+
+4. this Inside a Function
+
+Example
+
+function myFunction() {
+  console.log(this);
+}
+
+myFunction();
+
+Output (in browser)
+
+window object
+
+Because it is called as a regular function.
+
+5. this in Arrow Functions
+
+Arrow functions do not have their own this.
+
+They inherit this from the surrounding scope.
+
+Example
+
+const myFun = () => {
+  console.log(this);
+};
+
+myFun();
+
+Output
+
+window object
+6. this Inside an Object Method
+
+Example
+
+let user = {
+  name: "Piyush",
+  age: 24,
+
+  getDetails() {
+    console.log(this.name);
+  }
+};
+
+user.getDetails();
+
+Output
+
+Piyush
+
+Because
+
+this → user object
+7. Nested Object Example
+
+Example
+
+let user = {
+  name: "Piyush",
+  age: 24,
+
+  childObj: {
+    newName: "Roadside Coder",
+
+    getDetails() {
+      console.log(this.newName, this.name);
+    }
+  }
+};
+
+user.childObj.getDetails();
+
+Output
+
+Roadside Coder undefined
+
+Explanation
+
+this → childObj
+
+childObj has
+
+newName
+
+but no name property.
+
+8. Arrow Function Inside Object
+
+Example
+
+let user = {
+  name: "Piyush",
+
+  getDetails: () => {
+    console.log(this.name);
+  }
+};
+
+user.getDetails();
+
+Output
+
+undefined
+
+Because arrow functions inherit this from
+
+global scope
+9. Arrow Function Inside Method
+
+Example
+
+let user = {
+  name: "Piyush",
+
+  getDetails() {
+
+    const nestedArrow = () => {
+      console.log(this.name);
+    };
+
+    nestedArrow();
+  }
+};
+
+user.getDetails();
+
+Output
+
+Piyush
+
+Because arrow function inherits this from
+
+parent function → user object
+10. this in Classes
+
+Example
+
+class User {
+
+  constructor(name) {
+    this.name = name;
+  }
+
+  getName() {
+    console.log(this.name);
+  }
+}
+
+const user = new User("Piyush");
+
+user.getName();
+
+Output
+
+Piyush
+
+this refers to the object created using new.
+
+11. Interview Question 1
+const user = {
+  firstName: "Piyush!",
+  getName() {
+
+    const firstName = "Jen!";
+    return this.firstName;
+
+  }
+};
+
+console.log(user.getName());
+
+Output
+
+Piyush!
+
+Explanation
+
+this.firstName → object property
+
+Not the local variable.
+
+12. Interview Question 2
+function makeUser() {
+  return {
+    name: "John",
+    ref: this
+  };
+}
+
+let user = makeUser();
+
+console.log(user.ref.name);
+
+Output
+
+Error
+
+Explanation
+
+makeUser() is called as regular function
+
+this → undefined
+
+So
+
+user.ref → undefined
+Correct Solution
+function makeUser() {
+
+  return {
+    name: "Piyush",
+
+    ref() {
+      return this;
+    }
+  };
+
+}
+
+let user = makeUser();
+
+console.log(user.ref().name);
+
+Output
+
+Piyush
+13. Interview Question (setTimeout)
+const user = {
+  name: "Piyush",
+
+  logMessage() {
+    console.log(this.name);
+  }
+};
+
+setTimeout(user.logMessage, 1000);
+
+Output
+
+undefined
+
+Because function is executed as
+
+regular function
+Fix
+
+Use bind.
+
+setTimeout(user.logMessage.bind(user), 1000);
+
+Output
+
+Piyush
+14. Arrow vs Normal Function Example
+const user = {
+
+  name: "Piyush",
+
+  greet() {
+    return `Hello, ${this.name}`;
+  },
+
+  farewell: () => {
+    return `Goodbye, ${this.name}`;
+  }
+};
+
+console.log(user.greet());
+console.log(user.farewell());
+
+Output
+
+Hello, Piyush
+Goodbye, undefined
+
+Because arrow function does not bind this.
+
+15. Calculator Object Example
+
+Question: create calculator object.
+
+Solution
+
+let calculator = {
+
+  read() {
+    this.a = +prompt("a?");
+    this.b = +prompt("b?");
+  },
+
+  sum() {
+    return this.a + this.b;
+  },
+
+  mul() {
+    return this.a * this.b;
+  }
+
+};
+
+Usage
+
+calculator.read();
+
+console.log(calculator.sum());
+console.log(calculator.mul());
+16. Tricky Question
+var length = 4;
+
+function callback() {
+  console.log(this.length);
+}
+
+const object = {
+  length: 5,
+
+  method(callback) {
+    callback();
+  }
+};
+
+object.method(callback, 1, 2);
+
+Output
+
+4
+
+Explanation
+
+callback() runs as regular function.
+
+So
+
+this → window
+17. Another Tricky Question
+var length = 4;
+
+function callback() {
+  console.log(this.length);
+}
+
+const object = {
+
+  length: 5,
+
+  method() {
+    arguments[0]();
+  }
+
+};
+
+object.method(callback, 1, 2);
+
+Output
+
+3
+
+Explanation
+
+arguments = {0:callback,1:1,2:2,length:3}
+
+arguments[0]() sets
+
+this → arguments
+18. Method Chaining Example
+
+Question
+
+calc.add(10).multiply(5).subtract(30).add(10)
+
+Solution
+
+var calc = {
+
+  total: 0,
+
+  add(a) {
+    this.total += a;
+    return this;
+  },
+
+  subtract(a) {
+    this.total -= a;
+    return this;
+  },
+
+  multiply(a) {
+    this.total *= a;
+    return this;
+  }
+
+};
+
+Usage
+
+const result =
+calc.add(10).multiply(5).subtract(30).add(10);
+
+console.log(result.total);
+
+Output
+
+30
+19. Important this Rules (Interview Summary)
+
+1️⃣ this depends on how function is called
+
+2️⃣ In object methods
+
+this → object
+
+3️⃣ In regular functions
+
+this → window (browser)
+
+4️⃣ Arrow functions
+
+inherit this from parent scope
+
+5️⃣ call, apply, bind can change this.
+
+Final Interview Answer
+
+If interviewer asks:
+
+"What is this in JavaScript?"
+
+Answer:
+
+this is a special keyword that refers to the object that is currently executing the function. Its value is determined at runtime depending on how the function is invoked.
+-----------------------------------------------------------------------------------------------------------------------
 
 
+1. Why call, apply, and bind are used
 
+Normally the value of this depends on how the function is called.
+
+Sometimes we want to manually control this.
+
+Example problem
+
+var obj = { name: "Piyush" };
+
+function sayHello(){
+  return "Hello " + this.name;
+}
+
+console.log(sayHello());
+
+Output
+
+Hello undefined
+
+Because
+
+this → global object
+
+So this.name is undefined.
+
+To fix this we use:
+
+call()
+apply()
+bind()
+
+These methods belong to:
+
+Function.prototype
+2. call()
+Definition (Interview Answer)
+
+call() invokes a function immediately and allows you to specify the value of this.
+
+Syntax
+
+function.call(thisArg, arg1, arg2, ...)
+Example
+function sayHello(){
+  return "Hello " + this.name;
+}
+
+var obj = { name: "Piyush" };
+
+console.log(sayHello.call(obj));
+
+Output
+
+Hello Piyush
+
+Explanation
+
+this → obj
+Example with arguments
+function greet(day, status){
+  return "Hello " + this.name + " today is " + day + " and feel " + status;
+}
+
+var obj = { name: "Piyush" };
+
+console.log(greet.call(obj, "Tuesday", "good"));
+
+Output
+
+Hello Piyush today is Tuesday and feel good
+3. apply()
+Definition
+
+apply() works like call() but arguments are passed as an array.
+
+Syntax
+
+function.apply(thisArg, [argsArray])
+Example
+function greet(day, status){
+  return "Hello " + this.name + " today is " + day + " and feel " + status;
+}
+
+var obj = { name: "Piyush" };
+
+console.log(greet.apply(obj, ["Tuesday", "good"]));
+
+Output
+
+Hello Piyush today is Tuesday and feel good
+Difference Between call and apply
+Feature	call()	apply()
+Arguments	Passed individually	Passed as array
+Execution	Immediate	Immediate
+
+Example
+
+func.call(obj, 1, 2)
+func.apply(obj, [1,2])
+4. bind()
+Definition
+
+bind() creates a new function with this permanently bound to a specific object.
+
+Unlike call() and apply(), it does not execute immediately.
+
+Syntax
+
+function.bind(thisArg)
+Example
+function sayHello(){
+  return "Hello " + this.name;
+}
+
+var obj = { name: "Piyush" };
+
+const helloFn = sayHello.bind(obj);
+
+console.log(helloFn());
+
+Output
+
+Hello Piyush
+
+Explanation
+
+bind → returns new function
+5. Summary Table
+Method	Executes Immediately	Arguments Format
+call()	Yes	Individual
+apply()	Yes	Array
+bind()	No	Individual
+6. Interview Question 1
+const person = { name: "Piyush" };
+
+function sayHi(age){
+  return `${this.name} is ${age} years`;
+}
+
+console.log(sayHi.call(person, 24));
+console.log(sayHi.bind(person, 24));
+
+Output
+
+Piyush is 24 years
+[Function]
+
+Explanation
+
+bind → returns function
+call → executes function
+7. Interview Question 2
+const age = 10;
+
+var person = {
+  name: "Piyush",
+  age: 20,
+  getAge(){
+    return this.age;
+  }
+};
+
+var person2 = { age: 24 };
+
+console.log(person.getAge());
+
+Output
+
+20
+
+Because
+
+this → person
+
+Using call
+
+console.log(person.getAge.call(person2));
+
+Output
+
+24
+
+Using apply
+
+console.log(person.getAge.apply(person2));
+
+Output
+
+24
+
+Using bind
+
+console.log(person.getAge.bind(person2)());
+
+Output
+
+24
+8. Interview Question 3
+var status = "😎";
+
+setTimeout(() => {
+
+  const status = "😍";
+
+  const data = {
+    status: "🥑",
+
+    getStatus(){
+      return this.status;
+    }
+  };
+
+  console.log(data.getStatus());
+  console.log(data.getStatus.call(this));
+
+},0);
+
+Output
+
+🥑
+😎
+
+Explanation
+
+First line
+
+this → data
+
+Second line
+
+call(this) → global object
+9. Interview Question 4 (Animals Example)
+
+Given
+
+const animals = [
+  { species: "Lion", name: "King" },
+  { species: "Whale", name: "Queen" }
+];
+
+Function
+
+function printAnimals(i){
+  this.print = function(){
+    console.log("#" + i + " " + this.species + ": " + this.name);
+  };
+
+  this.print();
+}
+
+Solution
+
+for(let i = 0; i < animals.length; i++){
+  printAnimals.call(animals[i], i);
+}
+
+Output
+
+#0 Lion: King
+#1 Whale: Queen
+10. Appending Array using apply()
+
+Problem
+
+const array = ["a","b"];
+const elements = [0,1,2];
+
+array.push(elements);
+
+Output
+
+["a","b",[0,1,2]]
+
+Correct solution
+
+array.push.apply(array, elements);
+
+Output
+
+["a","b",0,1,2]
+11. Finding max and min using apply()
+
+Example
+
+const numbers = [5,6,2,3,7];
+
+let max = Math.max.apply(null, numbers);
+let min = Math.min.apply(null, numbers);
+
+console.log(max);
+console.log(min);
+
+Output
+
+7
+2
+
+Equivalent to
+
+Math.max(...numbers)
+12. Bound Function Interview Question
+function f(){
+  console.log(this);
+}
+
+let user = {
+  g: f.bind(null)
+};
+
+user.g();
+
+Output
+
+window object
+
+Explanation
+
+bind(null) fixes this → global object
+
+this cannot be changed afterward.
+
+13. Real-world Uses of call/apply/bind
+
+These are used in:
+
+Borrowing methods
+
+Example
+
+Array.prototype.slice.call(arguments)
+
+Setting this in callbacks
+
+React event handlers
+
+Method chaining
+
+Function reuse
+
+14. Perfect Interview Answer
+
+If interviewer asks:
+
+"What is the difference between call, apply and bind?"
+
+Answer:
+
+call, apply, and bind are JavaScript methods used to explicitly set the value of this. call and apply execute the function immediately, while bind returns a new function with this permanently bound to the provided object.
+
+--------------------------------------------------------------------------------------------------------------------------
+
+1. What is a Promise?
+Definition (Interview Answer)
+
+A Promise is an object that represents the eventual result of an asynchronous operation.
+
+It may either:
+
+complete successfully
+
+fail
+
+and provides methods to handle both outcomes.
+
+According to MDN:
+
+A Promise represents the eventual completion (or failure) of an asynchronous operation and its resulting value.
+
+2. Why Promises are used
+
+Before promises, asynchronous code was handled using callbacks, which caused:
+
+callback hell
+
+Example
+
+getUser(function(user){
+   getOrders(user,function(order){
+      getPayment(order,function(payment){
+         console.log(payment)
+      })
+   })
+})
+
+Promises solve this problem by making async code chainable and readable.
+
+3. Promise States
+
+A promise can be in three states.
+
+State	Meaning
+pending	initial state
+fulfilled	operation completed successfully
+rejected	operation failed
+
+Example
+
+let promise = new Promise((resolve, reject) => {
+   setTimeout(() => resolve("Success"), 2000);
+});
+
+States
+
+pending → fulfilled
+4. Basic Promise Example
+let promise = new Promise((resolve, reject) => {
+
+  setTimeout(() => {
+    resolve(100);
+  },3000);
+
+});
+
+promise
+  .then(val => console.log(val))
+  .catch(err => console.log(err));
+
+Output (after 3 seconds)
+
+100
+5. Promise Flow
+Create Promise
+      ↓
+Async operation runs
+      ↓
+resolve() OR reject()
+      ↓
+then() OR catch() executes
+6. Why Promise Polyfills?
+
+A polyfill means implementing a feature manually to understand its internal working.
+
+We create our own version of:
+
+Promise
+
+called
+
+PromisePolyFill
+7. Basic Structure of Promise Polyfill
+
+A Promise constructor accepts an executor function.
+
+new Promise((resolve, reject) => {})
+
+So we implement:
+
+function PromisePolyFill(executor) {
+
+}
+
+The executor receives
+
+resolve
+reject
+
+functions.
+
+8. Basic Polyfill Implementation
+function PromisePolyFill(executor){
+
+   let onResolve;
+
+   this.then = function(callback){
+      onResolve = callback;
+      return this;
+   }
+
+   this.catch = function(callback){
+      return this;
+   }
+
+}
+
+Here we store the callback passed to then().
+
+9. Adding Resolve Function
+
+Now we implement resolve.
+
+function resolve(val){
+   onResolve(val);
+}
+
+Updated code
+
+function PromisePolyFill(executor){
+
+   let onResolve;
+
+   function resolve(val){
+      onResolve(val);
+   }
+
+   this.then = function(callback){
+      onResolve = callback;
+      return this;
+   }
+
+   this.catch = function(callback){
+      return this;
+   }
+
+   executor(resolve);
+}
+10. Testing Polyfill
+new PromisePolyFill((resolve) =>
+   setTimeout(() => resolve(1000),1000)
+).then(val => console.log(val));
+
+Output
+
+1000
+11. Problem with Synchronous Execution
+
+Example
+
+new PromisePolyFill(resolve => resolve(1000))
+   .then(val => console.log(val))
+
+Error
+
+TypeError: onResolve is not a function
+
+Why?
+
+Because
+
+resolve() executes before then() assigns callback
+12. Fixing Sync Problem
+
+We introduce flags:
+
+fulfilled
+called
+value
+
+Purpose
+
+fulfilled → promise resolved
+called → callback executed
+value → stored result
+13. Full Promise Polyfill
+function PromisePolyFill(executor){
+
+ let onResolve, onReject;
+ let fulfilled = false;
+ let rejected = false;
+ let called = false;
+ let value;
+
+ function resolve(v){
+
+   fulfilled = true;
+   value = v;
+
+   if(typeof onResolve === "function"){
+      onResolve(value);
+      called = true;
+   }
+
+ }
+
+ function reject(reason){
+
+   rejected = true;
+   value = reason;
+
+   if(typeof onReject === "function"){
+      onReject(value);
+      called = true;
+   }
+
+ }
+
+ this.then = function(callback){
+
+   onResolve = callback;
+
+   if(fulfilled && !called){
+      called = true;
+      onResolve(value);
+   }
+
+   return this;
+ }
+
+ this.catch = function(callback){
+
+   onReject = callback;
+
+   if(rejected && !called){
+      called = true;
+      onReject(value);
+   }
+
+   return this;
+ }
+
+ try{
+   executor(resolve,reject)
+ }
+ catch(error){
+   reject(error)
+ }
+
+}
+14. PromisePolyFill.resolve()
+
+Returns a resolved promise.
+
+PromisePolyFill.resolve = (val) =>
+  new PromisePolyFill((resolve,reject)=>{
+     resolve(val);
+  });
+
+Example
+
+PromisePolyFill.resolve(10)
+.then(console.log)
+
+Output
+
+10
+15. PromisePolyFill.reject()
+
+Returns a rejected promise.
+
+PromisePolyFill.reject = (reason) =>
+  new PromisePolyFill((resolve,reject)=>{
+     reject(reason);
+  });
+
+Example
+
+PromisePolyFill.reject("Error")
+.catch(console.log)
+
+Output
+
+Error
+16. Promise.all Polyfill
+
+Promise.all() waits for all promises to resolve.
+
+Example
+
+Promise.all([p1,p2,p3])
+
+Polyfill
+
+PromisePolyFill.all = (promises)=>{
+
+ let results = [];
+ let fulfilledCount = 0;
+
+ return new PromisePolyFill((resolve,reject)=>{
+
+   promises.forEach((promise,index)=>{
+
+      promise.then(val=>{
+
+         results[index] = val;
+         fulfilledCount++;
+
+         if(fulfilledCount === promises.length){
+            resolve(results);
+         }
+
+      }).catch(reject)
+
+   });
+
+ })
+
+}
+17. Promise.race Polyfill
+
+Returns the first settled promise.
+
+function promiseRace(promises){
+
+ return new Promise((resolve,reject)=>{
+
+   promises.forEach(promise=>{
+      promise.then(resolve)
+      .catch(reject)
+   })
+
+ })
+
+}
+18. Promise.allSettled Polyfill
+
+Waits for all promises regardless of success or failure.
+
+Example output
+
+[
+ {status:"fulfilled", value:10},
+ {status:"rejected", reason:"error"}
+]
+
+Implementation
+
+function allSettled(promises){
+
+ let mapped = promises.map(promise =>
+
+   promise
+   .then(value => ({
+      status:"fulfilled",
+      value
+   }))
+   .catch(reason => ({
+      status:"rejected",
+      reason
+   }))
+
+ )
+
+ return Promise.all(mapped)
+
+}
+19. Promise.any Polyfill
+
+Returns first fulfilled promise.
+
+If all fail → reject.
+
+function any(promises){
+
+ let errors = [];
+ let rejectedCount = 0;
+
+ return new Promise((resolve,reject)=>{
+
+   promises.forEach((p,index)=>{
+
+      p.then(resolve)
+      .catch(err=>{
+
+        errors[index] = err;
+        rejectedCount++;
+
+        if(rejectedCount === promises.length){
+           reject(errors);
+        }
+
+      })
+
+   })
+
+ })
+
+}
+20. Promise Methods Comparison
+Method	Behavior
+Promise.all	resolves when all promises resolve
+Promise.race	resolves/rejects first
+Promise.allSettled	waits for all results
+Promise.any	resolves when first promise succeeds
+21. Very Common Interview Questions
+Q1 What are Promise states?
+pending
+fulfilled
+rejected
+Q2 Difference between then and catch
+then → success handler
+catch → error handler
+Q3 What is promise chaining?
+promise.then().then().catch()
+Q4 Why promises are better than callbacks?
+Avoid callback hell
+Better readability
+Better error handling
+Final Interview Definition
+
+If interviewer asks:
+
+“What is a Promise?”
+
+Answer:
+
+A Promise is a JavaScript object used to handle asynchronous operations. It represents a value that may be available now, later, or never, and allows handling success using then() and errors using catch().
+
+---------------------------------------------------------------------------------------------------------------
 
